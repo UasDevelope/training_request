@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:training_request/blocs/authentication/auth_bloc.dart';
+import 'package:training_request/blocs/booking/bloc.dart';
 
 import 'package:training_request/blocs/chat_user/bloc.dart';
 import 'package:training_request/blocs/chat_user/event.dart';
@@ -8,9 +9,12 @@ import 'package:training_request/blocs/home/event.dart';
 import 'package:training_request/blocs/inbox/bloc.dart';
 import 'package:training_request/blocs/inbox/event.dart';
 import 'package:training_request/blocs/location/bloc.dart';
-import 'package:training_request/blocs/location/event.dart';
 import 'package:training_request/blocs/nav/bloc.dart';
 import 'package:training_request/blocs/splash/splash_event.dart';
+import 'package:training_request/repositories/CurrentLocationRepository.dart';
+import 'package:training_request/repositories/auth_repository.dart';
+import 'package:training_request/repositories/booking_repository.dart';
+import 'package:training_request/repositories/location_repository.dart';
 
 import '../blocs/splash/splash_bloc.dart';
 
@@ -19,9 +23,9 @@ List<BlocProvider> getAppBlocProvider() {
     BlocProvider<SplashBloc>(
       create: (context) => SplashBloc()..add(checkAuthenticationStatus()),
     ),
-    BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
+    BlocProvider<AuthBloc>(create: (_) => AuthBloc(AuthRepository())),
     BlocProvider<LocationBloc>(
-      create: (_) => LocationBloc()..add(RequestEnableLocation()),
+      create: (_) => LocationBloc(LocationRepository(),CurrentLocationRepository()),
     ),
     BlocProvider<NavBloc>(create: (_) => NavBloc()),
     BlocProvider<HomeBloc>(create: (_) => HomeBloc()..add(HomeLoadedEvent())),
@@ -31,5 +35,6 @@ List<BlocProvider> getAppBlocProvider() {
     BlocProvider<ChatInboxBloc>(
       create: (_) => ChatInboxBloc()..add(ChatLoadedEvent()),
     ),
+    BlocProvider<BookingBloc>(create: (_) => BookingBloc(BookingRepository(),CurrentLocationRepository())),
   ];
 }

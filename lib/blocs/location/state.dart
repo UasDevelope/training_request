@@ -19,8 +19,12 @@ class LocationLoadedState extends LocationState {
   final double lat;
   final double long;
   final String location;
-  LocationLoadedState({required this.lat, required this.long,required this.location});
-  List<Object> get props => [lat,long,location];
+  LocationLoadedState({
+    required this.lat,
+    required this.long,
+    required this.location,
+  });
+  List<Object> get props => [lat, long, location];
 }
 
 class LocationPermissionDenied extends LocationState {}
@@ -32,7 +36,7 @@ class LocationSucessState extends LocationState {
   List<Object> get props => [message];
 }
 
-class LocationErrorState extends LocationState{
+class LocationErrorState extends LocationState {
   final String message;
 
   const LocationErrorState({required this.message});

@@ -16,8 +16,10 @@ class SplashScreen extends StatelessWidget {
     return BlocListener<SplashBloc, SplashState>(
       listener: (context, state) {
         if (state is SplashNavigateToHome) {
-          log("Navigate to HomeScreen");
-        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.login);
+        }
+
+        if (state is SplashNavigateToLogin) {
           Navigator.pushReplacementNamed(context, AppRoutes.login);
         }
       },

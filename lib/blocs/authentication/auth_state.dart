@@ -9,7 +9,9 @@ abstract class AuthState extends Equatable {
 
 class RememberChecked extends AuthState {
   final bool isRememberMeChecked;
+
   const RememberChecked({required this.isRememberMeChecked});
+
   List<Object> get props => [isRememberMeChecked];
 }
 
@@ -31,12 +33,16 @@ class AuthLoadedState extends AuthState {
   const AuthLoadedState();
 }
 
-class AuthSucessState extends AuthState {
+class AuthSuccessState extends AuthState {
   final String message;
-  const AuthSucessState({required this.message});
+  const AuthSuccessState({required this.message});
 }
 
 class AuthErrorState extends AuthState {
   final String message;
   const AuthErrorState({required this.message});
 }
+
+class SignupSubmitState extends AuthState {}
+
+class LoginState extends AuthState {}
