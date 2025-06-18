@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:training_request/screens/auth/signUp.dart';
+import 'package:training_request/screens/home/home.dart';
 import 'package:training_request/screens/location/location.dart';
 
 import '../screens/Transaction/transaction.dart';
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String nav="/nav";
   static const String chatInbox="/inbox";
   static const String transaction=  "/transaction";
+  static const String map="/map";
   static Route<dynamic> onGenerateRoute(RouteSettings setting) {
     switch (setting.name) {
       case splash:
@@ -37,6 +39,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_)=>ChatInbox());
       case transaction:
         return MaterialPageRoute(builder: (_)=>TransactionHistoryPage());
+      case map:
+        return MaterialPageRoute(builder: (_)=>HomeScreen());
       default:
         return MaterialPageRoute(
           builder:

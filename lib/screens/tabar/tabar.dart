@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:training_request/utils/const/app_color.dart';
 import 'package:training_request/utils/const/app_string.dart';
 
-import '../home/home.dart';
+import '../order/order.dart';
 
 class TabarScreen extends StatelessWidget {
   const TabarScreen({super.key});
@@ -35,7 +35,7 @@ class TabarScreen extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: [HomeScreen(), HomeScreen(), HomeScreen(), HomeScreen()],
+          children: [OrderScreen(), OrderScreen(), OrderScreen(), OrderScreen()],
         ),
       ),
     );

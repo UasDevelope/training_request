@@ -5,7 +5,7 @@ class AppImages {
   static get password => "password".png;
   static get loginSucess => "loginSucess".png;
   static get person => "person".png;
-  static get person1=> "person1".png;
+  static get person1 => "person1".png;
   static get driving => "driving".png;
   static get profile => "profile".png;
   static get drive => "drive".png;
@@ -18,12 +18,14 @@ class AppImages {
   static get calendar => "calendar".png;
   static get chat => "chat".png;
   static get setting => "setting".png;
-  static get  edit => "edit".png;
-  static get search  => "search".png;
+  static get edit => "edit".png;
+  static get search => "search".png;
   static get send => "send".png;
   static get editprofile => "editprofile".png;
   static get transaction => "transaction".png;
   static get tran => "tran".png;
+  static get start => 'start'.png;
+  static get end => "end".png;
 }
 
 extension ImagePathExtension on String {

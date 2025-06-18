@@ -19,6 +19,8 @@
 	<!-- If you only need location while the app is in the foreground -->
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs your location to show nearby services.</string>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
 
     <!-- If you truly need background location, add this one too -->
     <key>NSLocationAlwaysUsageDescription</key>

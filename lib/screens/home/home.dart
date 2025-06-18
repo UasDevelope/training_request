@@ -1,196 +1,151 @@
-import 'package:flutter/cupertino.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:training_request/blocs/home/bloc.dart';
-import 'package:training_request/blocs/home/state.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:training_request/screens/home/tripCard.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:training_request/utils/const/app_color.dart';
-import 'package:training_request/utils/const/app_img.dart';
-import 'package:training_request/utils/const/app_string.dart';
-import 'package:training_request/widgets/app_text.dart';
-import 'package:training_request/widgets/custom_button.dart';
+import '../../blocs/home/bloc.dart';
+import '../../blocs/home/state.dart';
+import '../../utils/const/app_color.dart';
+import '../../widgets/custom_button.dart';
 
-import '../../models/home.dart';
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late GoogleMapController _mapController;
+
+  final CameraPosition _initialPosition = CameraPosition(
+    target: LatLng(37.3346, -121.8910),
+    zoom: 14,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Colors.white, body: _body());
-  }
-
-  Widget _body() {
-    return BlocBuilder<HomeBloc, HomeState>(
-      builder: (context, state) {
-        if (state is HomeLoadingStat) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (state is HomeLoadedStat) {
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: state.homeModel.length,
-            itemBuilder: (context, index) {
-              final item = state.homeModel[index];
-              return _homeCard(item);
-            },
-          );
-        }
-        return const SizedBox();
-      },
-    );
-  }
-
-  Widget _homeCard(HomeModel item) {
-    return Card(
-      elevation: 2,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top row: Image, Name, ID, Hours
-            Row(
+    return Scaffold(
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          if (state is HomeLoadingState) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (state is HomeLoadedState) {
+            return Stack(
               children: [
-                CircleAvatar(
-                  backgroundImage: AssetImage(item.imageUrl),
-                  radius: 24,
+                // Google Map
+                Positioned.fill(
+                  child: GoogleMap(
+                    polylines: state.polyLines,
+                    initialCameraPosition: _initialPosition,
+                    zoomControlsEnabled: true,
+                    myLocationEnabled: true,
+                    markers: state.marker,
+                    onMapCreated: (controller) {
+                      _mapController = controller;
+                    },
+                  ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 3,
+
+                // Top Bar
+                Positioned(
+                  top: 50,
+                  left: 16,
+                  right: 16,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      AppText(
-                        text: item.userName,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Colors.black,
+                      Builder(
+                        builder:
+                            (context) => Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.menu),
+                                onPressed:
+                                    () => Scaffold.of(context).openDrawer(),
+                                color: Colors.black,
+                              ),
+                            ),
                       ),
-                      AppText(
-                        text: 'ID: ${item.bookingId}',
-                        color: AppColor.grey,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Text(
+                          "\$0",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.notifications_none),
+                          onPressed: () {},
+                        ),
                       ),
                     ],
                   ),
                 ),
-                AppText(
-                  text: "No of Hours : ${item.time}",
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColor.black,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
 
-            AppText(
-              text: "Assigned Driver : ${item.assignedDriver}",
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: AppColor.black,
-            ),
-
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Image.asset(
-                  AppImages.driving,
-                  color: AppColor.blue,
-                  height: 30,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: AppText(
-                    text: "Driving Permit Number : ${item.DrivingPermit}",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColor.black,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Image.asset(
-                  AppImages.mylocation,
-                  color: AppColor.blue,
-                  height: 30,
-                ),
-                SizedBox(width: 6),
-                Expanded(
-                  child: AppText(
-                    text: "Location: ${item.Location}",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColor.black,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Image.asset(
-                  AppImages.calendar,
-                  height: 30,
-                  color: AppColor.blue,
-                ),
-                const SizedBox(width: 6),
-                AppText(
-                  text: item.date,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColor.black,
-                ),
-                const Spacer(),
-                const Icon(Icons.access_time, size: 30),
-                const SizedBox(width: 4),
-                AppText(
-                  text: item.time,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColor.black,
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Text.rich(
-              TextSpan(
-                text: 'Price: ',
-                children: [
-                  TextSpan(
-                    text: "${item.payment}\$",
-                    style: TextStyle(
-                      color: AppColor.blue,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                //  Bottom Sheet
+                Positioned(
+                  bottom: 90,
+                  left: 10,
+                  right: 10,
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      height: 350, // Adjust based on card size
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      enlargeCenterPage: true,
+                      viewportFraction: 1,
+                      scrollDirection: Axis.horizontal,
                     ),
+                    items:
+                        state.homeModel.map((data) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return TripCard(
+                                data: data,
+                              ); // Your custom trip card widget
+                            },
+                          );
+                        }).toList(),
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: AppButton(
-                borderRadius: 16,
-                backgroundColor: Colors.white,
-                border: BorderSide(width: 1),
-                textColor: AppColor.black,
-                text: AppStrings.labelPayment,
-                onPressed: () {},
-              ),
-            ),
-          ],
-        ),
+                ),
+                Positioned(
+                  bottom: 30,
+                  left: 60,
+                  right: 60,
+                  child: AppButton(
+                    backgroundColor: AppColor.appColor,
+                    width: 200,
+                    text: "Accept job",
+                    onPressed: () {},
+                  ),
+                ),
+              ],
+            );
+          }
+          return Center(child: Text("Ok doing"));
+        },
       ),
     );
   }
