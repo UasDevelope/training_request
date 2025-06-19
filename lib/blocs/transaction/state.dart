@@ -16,3 +16,5 @@ class TransactionLoaded extends TransactionState {
 
   TransactionLoaded(this.transactions);
 }
+
+
