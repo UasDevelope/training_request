@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:training_request/core/app_routes.dart';
 import 'api/service_locator.dart';
 import 'core/bloc_provider.dart';
+
 void main() {
   setupLocator();
-
   runApp(MyApp());
 }
 class MyApp extends StatelessWidget {

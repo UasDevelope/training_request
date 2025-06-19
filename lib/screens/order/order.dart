@@ -182,7 +182,7 @@ class OrderScreen extends StatelessWidget {
                 textColor: AppColor.black,
                 text: AppStrings.labelPayment,
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRoutes.map);
+                  Navigator.pushNamed(context, AppRoutes.feedback);
                 },
               ),
             ),

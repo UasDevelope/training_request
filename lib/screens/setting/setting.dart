@@ -9,8 +9,7 @@ import 'package:training_request/widgets/app_text.dart';
 import '../edit/edit.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
+   SettingsScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +34,6 @@ class SettingsScreen extends StatelessWidget {
               child: Image.asset(AppImages.logo, height: 60, width: 60),
             ),
           ),
-
           const AppText(
             text: 'Preferences',
             fontSize: 16,
@@ -43,7 +41,6 @@ class SettingsScreen extends StatelessWidget {
             color: Colors.black,
           ),
           const SizedBox(height: 12),
-
           _SettingsTile(
             icon: AppImages.editprofile,
             title: 'Profile Setting',
@@ -56,7 +53,6 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 12),
-
           _SettingsTile(
             onTap: () {
               log("message");
@@ -66,7 +62,6 @@ class SettingsScreen extends StatelessWidget {
             title: 'Transaction History',
             subtitle: 'Check transaction history',
           ),
-
           const SizedBox(height: 30),
           AppText(
             text: 'Take a note',
@@ -74,7 +69,6 @@ class SettingsScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           const SizedBox(height: 12),
-
           _SimpleOptionTile(title: 'Privacy policy'),
           const SizedBox(height: 10),
           _SimpleOptionTile(title: 'Terms & Conditions'),

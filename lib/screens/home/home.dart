@@ -49,61 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Top Bar
-                Positioned(
-                  top: 50,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Builder(
-                        builder:
-                            (context) => Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: IconButton(
-                                icon: Icon(Icons.menu),
-                                onPressed:
-                                    () => Scaffold.of(context).openDrawer(),
-                                color: Colors.black,
-                              ),
-                            ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: Text(
-                          "\$0",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: IconButton(
-                          icon: Icon(Icons.notifications_none),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
                 //  Bottom Sheet
                 Positioned(
                   bottom: 90,

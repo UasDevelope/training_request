@@ -6,4 +6,6 @@ abstract class ApiConstants extends Equatable {
   static get login => "$BASEURL/auth/login";
   static get updateLocation => "$BASEURL/users/location";
   static get makeBooking => "$BASEURL/bookings";
+  static get feedback => "$BASEURL/feedback";
+  static get getHistory => "$BASEURL/users/transaction-history";
 }

@@ -3,6 +3,7 @@ import 'package:training_request/blocs/authentication/auth_bloc.dart';
 import 'package:training_request/blocs/booking/bloc.dart';
 import 'package:training_request/blocs/chat_user/bloc.dart';
 import 'package:training_request/blocs/chat_user/event.dart';
+import 'package:training_request/blocs/feedback/bloc.dart';
 import 'package:training_request/blocs/home/bloc.dart';
 import 'package:training_request/blocs/home/event.dart';
 import 'package:training_request/blocs/inbox/bloc.dart';
@@ -15,9 +16,9 @@ import 'package:training_request/blocs/splash/splash_event.dart';
 import 'package:training_request/repositories/CurrentLocationRepository.dart';
 import 'package:training_request/repositories/auth_repository.dart';
 import 'package:training_request/repositories/booking_repository.dart';
+import 'package:training_request/repositories/feedback.dart';
 import 'package:training_request/repositories/location_repository.dart';
 import '../blocs/splash/splash_bloc.dart';
-
 List<BlocProvider> getAppBlocProvider() {
   return [
     BlocProvider<SplashBloc>(
@@ -43,6 +44,9 @@ List<BlocProvider> getAppBlocProvider() {
     BlocProvider<BookingBloc>(
       create:
           (_) => BookingBloc(BookingRepository(), CurrentLocationRepository()),
+    ),
+    BlocProvider<FeedbackBloc>(
+      create: (_) => FeedbackBloc(FeedbackRepository()),
     ),
   ];
 }

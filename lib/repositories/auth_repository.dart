@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:training_request/services/local/storage.dart';
 import 'package:training_request/api/base_api_client.dart';
 import 'package:training_request/api/api_constants.dart';
-
 class AuthRepository {
   final BaseApiClient _apiClient = GetIt.instance<BaseApiClient>();
   Future<Map<String, dynamic>> SignupUser({
@@ -55,12 +54,20 @@ class AuthRepository {
     required String password,
   }) async {
     final Map<String, dynamic> body = {"email": email, "password": password};
-
     final response = await _apiClient.post(
       ApiConstants.login,
       body,
       auth: true,
     );
+    if (response.containsKey('token')) {
+      await LocalStorage.storeString(
+        LocalStorage.AcessToken,
+        response['token'],
+      );
+      return response;
+    } else {
+      throw Exception('Login failed: token not found in response');
+    }
     return response;
   }
 }

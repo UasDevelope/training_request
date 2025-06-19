@@ -12,16 +12,16 @@ class BookingRepository {
     String? specialRequirements,
     required double latitude,
     required double longitude,
-    String ?locationName,
+    String? locationName,
   }) async {
     final body = {
       "hours": hours,
       "date": date.toUtc().toIso8601String(),
       "price": price,
-      "latitude":latitude,
-      "longitude":longitude,
+      "latitude": latitude,
+      "longitude": longitude,
       if (locationName != null && locationName.isNotEmpty)
-      "locationName":locationName,
+        "locationName": locationName,
       if (specialRequirements != null && specialRequirements.isNotEmpty)
         "specialRequirements": specialRequirements,
     };
@@ -29,4 +29,6 @@ class BookingRepository {
     final response = await apiClient.post(ApiConstants.makeBooking, body);
     return response;
   }
+
+
 }

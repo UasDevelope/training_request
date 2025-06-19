@@ -14,7 +14,7 @@ class ApiClientImpl implements BaseApiClient {
   @override
   Future<dynamic> get(String endpoint) async {
     final token = await LocalStorage.getString(LocalStorage.AcessToken);
-    final uri = Uri.parse(ApiConstants.BASEURL + endpoint);
+    final uri = Uri.parse(endpoint);
 
     log("➡️ [GET] $uri");
     final response = await _client.get(uri, headers: _headers(token ?? ''));
