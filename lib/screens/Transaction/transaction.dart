@@ -16,7 +16,10 @@ class TransactionHistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => TransactionBloc()..add(LoadTransactions()),
+      create:
+          (_) =>
+              TransactionBloc(tranSactionRepository: TranSactionRepository())
+                ..add(LoadTransactions()),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -51,9 +54,9 @@ class TransactionHistoryPage extends StatelessWidget {
 }
 
 class _TransactionCard extends StatelessWidget {
-  final Transaction tx;
+  final TransactionModel tx;
 
-  const _TransactionCard(this.tx);
+  const _TransactionCard(this.tx, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -61,54 +64,74 @@ class _TransactionCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColor.pastel,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Image.asset(AppImages.tran, height: 40, width: 40),
+          // Icon
+          Image.asset(
+            AppImages.tran,
+            height: 40,
+            width: 40,
+          ),
 
           const SizedBox(width: 12),
+
+          // Transaction Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppText(text: "ID: ${tx.id}", fontWeight: FontWeight.bold),
                 AppText(
-                  text: "Transaction ID\n${tx.transactionId}",
+                  text: "ID: ${tx.recordId}",
+                  fontWeight: FontWeight.bold,
+                ),
+                const SizedBox(height: 4),
+                AppText(
+                  text: "Transaction ID: ${tx.transactionId}",
                   fontSize: 12,
+                  color: AppColor.grey,
                 ),
               ],
             ),
           ),
+
+          // Amount & Status
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               AppText(
-                text: "\$ ${tx.amount.toStringAsFixed(2)}",
-
+                text: "\$${tx.amount.toStringAsFixed(2)}",
                 color: isCompleted ? Colors.green : AppColor.blue,
                 fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isCompleted ? Colors.green[100] : Colors.red[100],
+                  color:
+                  isCompleted ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: AppText(
-                  text: tx.status,
-
+                  text: tx.status, // ✅ Fixed this
                   color: isCompleted ? Colors.green : Colors.red,
                   fontSize: 12,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               AppText(
-                text: "${tx.date}  ${tx.time}",
+                text: tx.date,
                 fontSize: 11,
                 color: AppColor.grey,
               ),

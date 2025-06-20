@@ -12,7 +12,7 @@ abstract class TransactionState extends Equatable {
 class TransactionLoading extends TransactionState {}
 
 class TransactionLoaded extends TransactionState {
-  final List<Transaction> transactions;
+  final List<TransactionModel> transactions;
 
   TransactionLoaded(this.transactions);
 }
