@@ -5,7 +5,6 @@ import 'package:training_request/utils/const/app_color.dart';
 import 'package:training_request/utils/const/app_img.dart';
 import 'package:training_request/widgets/app_text.dart';
 import '../../blocs/feedback/bloc.dart';
-
 class FeedbackScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
