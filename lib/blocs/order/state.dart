@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:training_request/models/booking.dart';
 import 'package:training_request/models/home.dart';
 import 'package:training_request/models/order.dart';
 
@@ -17,7 +18,7 @@ class OrderLoadingStat extends OrderState {
 }
 
 class OrderLoadedStat extends OrderState {
-  final List<orderModel> homeModel;
+  final List<OrderModel> homeModel;
   const OrderLoadedStat({required this.homeModel});
   List<Object> get props => [];
 }

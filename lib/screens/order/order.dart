@@ -40,7 +40,7 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _orderCard(orderModel item,BuildContext context) {
+  Widget _orderCard(OrderModel item,BuildContext context) {
     return Card(
       elevation: 2,
       color: Colors.white,
@@ -52,24 +52,24 @@ class OrderScreen extends StatelessWidget {
             // Top row: Image, Name, ID, Hours
             Row(
               children: [
-                CircleAvatar(
-                  backgroundImage: AssetImage(item.imageUrl),
-                  radius: 24,
-                ),
+                // CircleAvatar(
+                //   backgroundImage: AssetImage(item.imageUrl),
+                //   radius: 24,
+                // ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     spacing: 3,
                     children: [
+                      // AppText(
+                      //   text: item.u,
+                      //   fontWeight: FontWeight.w600,
+                      //   fontSize: 16,
+                      //   color: Colors.black,
+                      // ),
                       AppText(
-                        text: item.userName,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                      AppText(
-                        text: 'ID: ${item.bookingId}',
+                        text: 'ID: ${item.serviceProviderId}',
                         color: AppColor.grey,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -78,7 +78,7 @@ class OrderScreen extends StatelessWidget {
                   ),
                 ),
                 AppText(
-                  text: "No of Hours : ${item.time}",
+                  text: "No of Hours : ${item.date}",
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColor.black,
@@ -87,7 +87,7 @@ class OrderScreen extends StatelessWidget {
             ),
             SizedBox(height: 12),
             AppText(
-              text: "Assigned Driver : ${item.assignedDriver}",
+              text: "Assigned Driver : ${item.serviceProviderId}",
               fontSize: 16,
               fontWeight: FontWeight.w400,
               color: AppColor.black,
@@ -101,14 +101,14 @@ class OrderScreen extends StatelessWidget {
                   height: 30,
                 ),
                 SizedBox(width: 6),
-                Expanded(
-                  child: AppText(
-                    text: "Driving Permit Number : ${item.DrivingPermit}",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColor.black,
-                  ),
-                ),
+                // Expanded(
+                //   child: AppText(
+                //     text: "Driving Permit Number : ${item.DrivingPermit}",
+                //     fontSize: 16,
+                //     fontWeight: FontWeight.w400,
+                //     color: AppColor.black,
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(height: 6),
@@ -122,7 +122,7 @@ class OrderScreen extends StatelessWidget {
                 SizedBox(width: 6),
                 Expanded(
                   child: AppText(
-                    text: "Location: ${item.Location}",
+                    text: "Location: ${item.locationName}",
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: AppColor.black,
@@ -140,7 +140,7 @@ class OrderScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 AppText(
-                  text: item.date,
+                  text: item.date.toString(),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: AppColor.black,
@@ -149,7 +149,7 @@ class OrderScreen extends StatelessWidget {
                 const Icon(Icons.access_time, size: 30),
                 const SizedBox(width: 4),
                 AppText(
-                  text: item.time,
+                  text: item.date.toString(),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: AppColor.black,
@@ -162,7 +162,7 @@ class OrderScreen extends StatelessWidget {
                 text: 'Price: ',
                 children: [
                   TextSpan(
-                    text: "${item.payment}\$",
+                    text: "${item.price}\$",
                     style: TextStyle(
                       color: AppColor.blue,
                       fontSize: 20,

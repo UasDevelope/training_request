@@ -6,7 +6,7 @@ import 'package:training_request/models/transaction.dart';
 class TranSactionRepository {
   final BaseApiClient apiClient = GetIt.instance<BaseApiClient>();
   Future<TransactionResponse> FetchHistory() async {
-    var response = await apiClient.get(ApiConstants.fetchBooking);
+    var response = await apiClient.get(ApiConstants.getHistory);
     return TransactionResponse.fromMap(response);
   }
 }

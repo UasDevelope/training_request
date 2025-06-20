@@ -18,6 +18,7 @@ import 'package:training_request/repositories/auth_repository.dart';
 import 'package:training_request/repositories/booking_repository.dart';
 import 'package:training_request/repositories/feedback.dart';
 import 'package:training_request/repositories/location_repository.dart';
+import 'package:training_request/repositories/order_repo.dart';
 import '../blocs/splash/splash_bloc.dart';
 List<BlocProvider> getAppBlocProvider() {
   return [
@@ -32,7 +33,7 @@ List<BlocProvider> getAppBlocProvider() {
     ),
     BlocProvider<NavBloc>(create: (_) => NavBloc()),
     BlocProvider<OrderBloc>(
-      create: (_) => OrderBloc()..add(OrderLoadedEvent()),
+      create: (_) => OrderBloc(orderRepository:OrderRepository())..add(OrderLoadedEvent()),
     ),
     BlocProvider<ChatUserBloc>(
       create: (_) => ChatUserBloc()..add(ChatUserLoadedEvent()),
