@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +15,8 @@ import 'package:training_request/widgets/custom_button.dart';
 import '../../models/home.dart';
 
 class OrderScreen extends StatelessWidget {
-  const OrderScreen({super.key});
+  final String orderStatus;
+  const OrderScreen({required this.orderStatus});
   @override
   Widget build(BuildContext context) {
     return Scaffold(backgroundColor: Colors.white, body: _body());
@@ -30,8 +33,21 @@ class OrderScreen extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             itemCount: state.homeModel.length,
             itemBuilder: (context, index) {
-              final item = state.homeModel[index];
-              return _orderCard(item,context);
+              final List<OrderModel> filteredList =
+                  state.homeModel
+                      .where((item) => item.status == orderStatus)
+                      .toList();
+
+              return filteredList.isEmpty
+                  ? Center(child: Text("No data"))
+                  : ListView.builder(
+                shrinkWrap: true,
+                itemCount: filteredList.length,
+                itemBuilder: (context, index) {
+                  return _orderCard(filteredList[index], context);
+                },
+              );
+
             },
           );
         }
@@ -40,7 +56,7 @@ class OrderScreen extends StatelessWidget {
     );
   }
 
-  Widget _orderCard(OrderModel item,BuildContext context) {
+  Widget _orderCard(OrderModel item, BuildContext context) {
     return Card(
       elevation: 2,
       color: Colors.white,

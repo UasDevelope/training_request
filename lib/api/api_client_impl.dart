@@ -5,12 +5,9 @@ import 'package:training_request/api/api_constants.dart';
 import 'package:training_request/api/api_exception.dart';
 import 'package:training_request/services/local/storage.dart';
 import 'base_api_client.dart';
-
 class ApiClientImpl implements BaseApiClient {
   final http.Client _client;
-
   ApiClientImpl(this._client);
-
   @override
   Future<dynamic> get(String endpoint) async {
     final token = await LocalStorage.getString(LocalStorage.AcessToken);

@@ -35,7 +35,12 @@ class TabarScreen extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: [OrderScreen(), OrderScreen(), OrderScreen(), OrderScreen()],
+          children: [
+            OrderScreen(orderStatus: 'pending'),
+            OrderScreen(orderStatus: 'active'),
+            OrderScreen(orderStatus: 'inprogresss'),
+            OrderScreen(orderStatus: 'completed'),
+          ],
         ),
       ),
     );
