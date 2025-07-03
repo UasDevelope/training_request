@@ -33,7 +33,6 @@ Widget Body() {
     listener: (context, state) {
       if (state is AuthSuccessState) {
         ToastHelper.showToast(message: state.message, type: ToastType.success);
-
         Navigator.pushNamed(context, AppRoutes.loginSucess);
       }
       if (state is AuthErrorState) {

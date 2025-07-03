@@ -6,6 +6,7 @@ import 'package:training_request/blocs/authentication/auth_state.dart';
 import 'package:training_request/repositories/auth_repository.dart';
 
 import '../../api/api_exception.dart';
+import '../../services/local/storage.dart';
 
 class AuthBloc extends Bloc<AuthEvents, AuthState> {
   final AuthRepository authRepository;
@@ -29,6 +30,7 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
           role: "user",
         );
         log("Response${response}");
+        await LocalStorage.storeString(LocalStorage.AcessToken,response["token"]);
         emit(
           AuthSuccessState(message: response["message"] ?? "Signup successful"),
         );
@@ -49,10 +51,12 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
         emit(
           AuthSuccessState(message: response["message"] ?? "Login successful"),
         );
+        log("Response${response}");
+        await LocalStorage.storeString(LocalStorage.AcessToken,response["token"]);
       } on BadExceptionRequest catch (e) {
-        emit(AuthErrorState(message: e.message)); // ← Your message is passed
+        emit(AuthErrorState(message: e.message));
       } catch (e) {
-        emit(AuthErrorState(message: e.toString())); // ← Your message is passed
+        emit(AuthErrorState(message: e.toString()));
       }
     });
   }

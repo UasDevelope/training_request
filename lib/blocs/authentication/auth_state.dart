@@ -9,9 +9,7 @@ abstract class AuthState extends Equatable {
 
 class RememberChecked extends AuthState {
   final bool isRememberMeChecked;
-
   const RememberChecked({required this.isRememberMeChecked});
-
   List<Object> get props => [isRememberMeChecked];
 }
 

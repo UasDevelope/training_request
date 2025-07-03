@@ -33,7 +33,7 @@ List<BlocProvider> getAppBlocProvider() {
     ),
     BlocProvider<NavBloc>(create: (_) => NavBloc()),
     BlocProvider<OrderBloc>(
-      create: (_) => OrderBloc(orderRepository:OrderRepository())..add(OrderLoadedEvent()),
+      create: (_) => OrderBloc(orderRepository:OrderRepository()),
     ),
     BlocProvider<ChatUserBloc>(
       create: (_) => ChatUserBloc()..add(ChatUserLoadedEvent()),

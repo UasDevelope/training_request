@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:training_request/api/api_constants.dart';
 import 'package:training_request/utils/const/app_color.dart';
 import 'package:training_request/utils/const/app_string.dart';
 
@@ -24,11 +26,13 @@ class TabarScreen extends StatelessWidget {
             labelColor: AppColor.appColor,
             automaticIndicatorColorAdjustment: true,
             indicatorColor: AppColor.blue,
+            labelStyle: TextStyle(fontWeight: FontWeight.w600,fontSize: 16),
             unselectedLabelColor: AppColor.blue,
+            unselectedLabelStyle:  TextStyle(fontWeight: FontWeight.w900,fontSize: 14),
             dividerColor: Colors.white,
             tabs: [
-              Tab(text: AppStrings.statusNew),
               Tab(text: AppStrings.statusActive),
+              Tab(text: AppStrings.statusSubmitted),
               Tab(text: AppStrings.statusInProgress),
               Tab(text: AppStrings.statusCompleted),
             ],
@@ -36,10 +40,10 @@ class TabarScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            OrderScreen(orderStatus: 'pending'),
-            OrderScreen(orderStatus: 'active'),
-            OrderScreen(orderStatus: 'inprogresss'),
-            OrderScreen(orderStatus: 'completed'),
+            OrderScreen(endPoint: ApiConstants.fetchPendingBookings),
+            OrderScreen(endPoint: ApiConstants.fetchSubmittedBookings,inSubmitted: true,),
+            OrderScreen(endPoint: ApiConstants.fetchInProgressBookings,inProgress: true,),
+            OrderScreen(endPoint: ApiConstants.fetchCompletedBookings),
           ],
         ),
       ),

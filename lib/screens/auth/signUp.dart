@@ -48,7 +48,6 @@ class SignupScreen extends StatelessWidget {
         builder: (context, state) {
           final isChecked =
               state is TermsChecked ? state.isTermsChecked : false;
-
           return Form(
             key: formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,

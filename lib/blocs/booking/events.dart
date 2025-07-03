@@ -45,3 +45,5 @@ class UpdateDateTime extends BookingEvent {
   @override
   List<Object> get props => [dateTime];
 }
+
+class ClearController extends BookingEvent{}

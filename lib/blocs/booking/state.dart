@@ -2,16 +2,19 @@ import 'package:equatable/equatable.dart';
 
 abstract class BookingStat extends Equatable {
   const BookingStat();
+  @override
   List<Object> get props => [];
 }
 
 class BookingLoading extends BookingStat {
-  BookingLoading();
+  const BookingLoading();
+  @override
   List<Object> get props => [];
 }
 
 class BookingInitialState extends BookingStat {
   const BookingInitialState();
+  @override
   List<Object> get props => [];
 }
 
@@ -22,17 +25,20 @@ class UpdateDateTimeState extends BookingStat {
     return UpdateDateTimeState(dateTime: dateTime!);
   }
 
+  @override
   List<Object> get props => [dateTime];
 }
 
 class BookingSuccess extends BookingStat {
   final String message;
   const BookingSuccess({required this.message});
+  @override
   List<Object> get props => [message];
 }
 
 class BookingError extends BookingStat {
   final String message;
   const BookingError({required this.message});
+  @override
   List<Object> get props => [message];
 }

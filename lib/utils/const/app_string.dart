@@ -57,8 +57,8 @@ class AppStrings {
       "To enable location, show we will know your location.";
   static const String enableButton = "Enable";
   static const String welcomeMessage = "👋 Welcome back, {name}!";
-  static const String statusNew = "New";
-  static const String statusActive = "Active";
+  static const String statusActive = "Pending";
+  static const String statusSubmitted = "Submitted";
   static const String statusInProgress = "In Progress";
   static const String statusCompleted = "Completed";
 
@@ -72,6 +72,8 @@ class AppStrings {
   static const String labelTime = "Time";
   static const String labelPrice = "Price";
   static const String labelPayment = "Payment";
+  static const String labelAccept = "Accept";
+  static const String labelReject = "Reject";
 
   static const String navHome = "Home";
   static const String navBooking = "Booking";

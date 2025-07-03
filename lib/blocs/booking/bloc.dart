@@ -50,5 +50,13 @@ class BookingBloc extends Bloc<BookingEvent, BookingStat> {
       emit(UpdateDateTimeState(dateTime: event.dateTime));
       log("Selected date: $formatted");
     });
+    on<ClearController>(clearController);
+  }
+
+  void clearController(ClearController event, Emitter<BookingStat> emit) {
+    Nohrs.clear();
+    price.clear();
+    writeSomething.clear();
+    date.clear();
   }
 }
