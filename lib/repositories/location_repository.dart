@@ -15,12 +15,10 @@ class LocationRepository {
       "longitude": longitude,
       if (locationName != null) "locationName": locationName,
     };
-
     final response = await _apiClient.put(
       ApiConstants.updateLocation,
       body,
     );
-
     return response;
   }
 }

@@ -4,17 +4,63 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:training_request/blocs/home/state.dart';
+import 'package:training_request/repositories/home.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../dumy/home.dart';
 import '../../models/home.dart';
+import '../../repositories/CurrentLocationRepository.dart';
+import '../../repositories/location_repository.dart';
 import '../../utils/const/app_img.dart';
 import 'event.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  HomeBloc() : super(HomeInitialState()) {
+  CurrentLocationRepository currentLocationRepository;
+  HomeRepository homeRepository;
+  HomeBloc({
+    required this.currentLocationRepository,
+    required this.homeRepository,
+  }) : super(HomeInitialState()) {
     on<HomeLoadedEvent>(_onLoadHomeData);
+    on<UpdateLiveLocationEvent>(_onUpdateLiveLocation);
+  }
+  void startLiveTracking() {
+    final locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    );
+
+    Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (position) {
+        add(UpdateLiveLocationEvent()); // ✅ Triggers sending location via socket
+      },
+    );
+  }
+
+  Future<void> _onUpdateLiveLocation(
+    UpdateLiveLocationEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    try {
+      final (lat, long, locationName) =
+          await currentLocationRepository.getCurrentLocation();
+
+      log("📡 Sending location via WebSocket: $lat, $long");
+
+      await homeRepository.updateLocationEvent(
+        lat,
+        long,
+        locationName,
+        "user_123", // custom user ID
+        "continuous",
+      );
+    } catch (e) {
+      log("❌ Failed to update location via socket: $e");
+    }
   }
 
   Future<void> _onLoadHomeData(
@@ -22,7 +68,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     emit(HomeLoadingState());
-
     try {
       final homeDummy = HomeDummy();
       final homedata =
@@ -34,7 +79,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         target: LatLng(homedata[0].studentLat, homedata[0].studentLong),
         zoom: 10,
       );
-
       for (var i = 0; i < homedata.length; i++) {
         final item = homedata[i];
         final studentLatLng = LatLng(item.studentLat, item.studentLong);
@@ -43,7 +87,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final driverIcon = await _getCustomIcon(AppImages.end);
         print("Student icon path: ${AppImages.start}");
         print("Driver icon path: ${AppImages.end}");
-
         marker.add(
           Marker(
             markerId: MarkerId('student_${i}'),
@@ -52,7 +95,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             infoWindow: InfoWindow(title: 'Student ${item.studentName}'),
           ),
         );
-
         marker.add(
           Marker(
             markerId: MarkerId('driver_${i}'),
@@ -61,7 +103,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             infoWindow: InfoWindow(title: 'Driver ${item.driverStateCountry}'),
           ),
         );
-
         final route = await _getPolyline(studentLatLng, driverLatLng);
         print('Polyline route for item $i: ${route.length} points');
 
@@ -76,7 +117,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           );
         }
       }
-
       emit(
         HomeLoadedState(
           homeModel: homedata,

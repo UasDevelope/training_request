@@ -17,6 +17,7 @@ import 'package:training_request/repositories/CurrentLocationRepository.dart';
 import 'package:training_request/repositories/auth_repository.dart';
 import 'package:training_request/repositories/booking_repository.dart';
 import 'package:training_request/repositories/feedback.dart';
+import 'package:training_request/repositories/home.dart';
 import 'package:training_request/repositories/location_repository.dart';
 import 'package:training_request/repositories/order_repo.dart';
 import '../blocs/splash/splash_bloc.dart';
@@ -41,7 +42,7 @@ List<BlocProvider> getAppBlocProvider() {
     BlocProvider<ChatInboxBloc>(
       create: (_) => ChatInboxBloc()..add(ChatLoadedEvent()),
     ),
-    BlocProvider<HomeBloc>(create: (_) => HomeBloc()..add(HomeLoadedEvent())),
+    BlocProvider<HomeBloc>(create: (_) => HomeBloc(currentLocationRepository: CurrentLocationRepository(),homeRepository:HomeRepository())..add(HomeLoadedEvent())),
     BlocProvider<BookingBloc>(
       create:
           (_) => BookingBloc(BookingRepository(), CurrentLocationRepository()),

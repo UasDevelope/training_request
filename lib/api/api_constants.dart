@@ -14,6 +14,8 @@ abstract class ApiConstants extends Equatable {
   static get fetchInProgressBookings =>"$BASEURL/bookings/user/inprogress";
   static get fetchCompletedBookings =>"$BASEURL/bookings/user/completed";
   static get fetchSubmittedBookings =>"$BASEURL/bookings/user/submitted";
+  static get socketChannel=> "wss://training-syste-be.vercel.app";
+  static get updateLocationEvent => "updateLocation";
 
 
 }

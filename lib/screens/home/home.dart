@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
             return Center(child: CircularProgressIndicator());
           }
           if (state is HomeLoadedState) {
+            // ✅ Start 10-meter live tracking
+            context.read<HomeBloc>().startLiveTracking();
             return Stack(
               children: [
                 // Google Map
