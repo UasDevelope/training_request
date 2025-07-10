@@ -12,6 +12,7 @@ import 'package:training_request/blocs/location/bloc.dart';
 import 'package:training_request/blocs/nav/bloc.dart';
 import 'package:training_request/blocs/order/bloc.dart';
 import 'package:training_request/blocs/order/event.dart';
+import 'package:training_request/blocs/order_chat/bloc.dart';
 import 'package:training_request/blocs/splash/splash_event.dart';
 import 'package:training_request/repositories/CurrentLocationRepository.dart';
 import 'package:training_request/repositories/auth_repository.dart';
@@ -49,6 +50,9 @@ List<BlocProvider> getAppBlocProvider() {
     ),
     BlocProvider<FeedbackBloc>(
       create: (_) => FeedbackBloc(FeedbackRepository()),
+    ),
+    BlocProvider<OrderChatBloc>(
+      create: (_) => OrderChatBloc(),
     ),
   ];
 }

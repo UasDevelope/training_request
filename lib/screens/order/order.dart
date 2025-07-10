@@ -10,6 +10,7 @@ import 'package:training_request/utils/const/app_img.dart';
 import 'package:training_request/utils/const/app_string.dart';
 import 'package:training_request/widgets/app_text.dart';
 import 'package:training_request/widgets/custom_button.dart';
+
 import '../../blocs/order/event.dart';
 
 class OrderScreen extends StatelessWidget {
@@ -31,12 +32,11 @@ class OrderScreen extends StatelessWidget {
 
   Widget _body() {
     return BlocBuilder<OrderBloc, OrderState>(
-      buildWhen:
-          (previous, current) =>
-              current is OrderLoadingStat ||
-              current is OrderLoadedStat ||
-              current is ProposalLoadingStat ||
-              current is ProposalLoadedStat,
+      buildWhen: (previous, current) =>
+          current is OrderLoadingStat ||
+          current is OrderLoadedStat ||
+          current is ProposalLoadingStat ||
+          current is ProposalLoadedStat,
       builder: (context, state) {
         if (state is OrderLoadingStat) {
           return const Center(child: CircularProgressIndicator());
@@ -118,34 +118,34 @@ class OrderScreen extends StatelessWidget {
               isSubmitted
                   ? SizedBox.shrink()
                   : AppText(
-                    text:
-                        "Assigned Driver: ${item.assignedDriver != null && item.assignedDriver!.isNotEmpty ? item.assignedDriver : 'Not Assigned'}",
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColor.black,
-                  ),
+                      text:
+                          "Assigned Driver: ${item.assignedDriver != null && item.assignedDriver!.isNotEmpty ? item.assignedDriver : 'Not Assigned'}",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColor.black,
+                    ),
               isSubmitted ? SizedBox.shrink() : SizedBox(height: 6),
               isSubmitted
                   ? SizedBox.shrink()
                   : Row(
-                    children: [
-                      Image.asset(
-                        AppImages.driving,
-                        color: AppColor.blue,
-                        height: 30,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: AppText(
-                          text:
-                              "Driving Permit Number: ${item.driverPermitNumber ?? "-"}",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: AppColor.black,
+                      children: [
+                        Image.asset(
+                          AppImages.driving,
+                          color: AppColor.blue,
+                          height: 30,
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: AppText(
+                            text:
+                                "Driving Permit Number: ${item.driverPermitNumber ?? "-"}",
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: AppColor.black,
+                          ),
+                        ),
+                      ],
+                    ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -213,11 +213,11 @@ class OrderScreen extends StatelessWidget {
               !isSubmitted
                   ? SizedBox.shrink()
                   : AppText(
-                    text: "Proposals:",
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: AppColor.blue,
-                  ),
+                      text: "Proposals:",
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppColor.blue,
+                    ),
               item.proposals != null && item.proposals!.isNotEmpty
                   ? SizedBox(height: 12)
                   : SizedBox.shrink(),
@@ -225,11 +225,11 @@ class OrderScreen extends StatelessWidget {
                 ...item.proposals!.map((proposal) {
                   final serviceProvider = proposal.serviceProvider;
                   context.read<OrderBloc>().add(
-                    FetchLocationDetailsEvent(
-                      longitude: proposal.currentLocation!.coordinates[0],
-                      latitude: proposal.currentLocation!.coordinates[1],
-                    ),
-                  );
+                        FetchLocationDetailsEvent(
+                          longitude: proposal.currentLocation!.coordinates[0],
+                          latitude: proposal.currentLocation!.coordinates[1],
+                        ),
+                      );
                   return Container(
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
@@ -278,10 +278,9 @@ class OrderScreen extends StatelessWidget {
                               SizedBox(width: 6),
                               Expanded(
                                 child: BlocBuilder<OrderBloc, OrderState>(
-                                  buildWhen:
-                                      (previous, current) =>
-                                          current is LocationLoadingState ||
-                                          current is LocationLoaded,
+                                  buildWhen: (previous, current) =>
+                                      current is LocationLoadingState ||
+                                      current is LocationLoaded,
                                   builder: (context, state) {
                                     if (state is LocationLoaded) {
                                       return AppText(
@@ -345,11 +344,11 @@ class OrderScreen extends StatelessWidget {
                                   text: AppStrings.labelReject,
                                   onPressed: () {
                                     context.read<OrderBloc>().add(
-                                      AcceptRejectProposal(
-                                        proposalId: proposal.id,
-                                        purpose: "reject",
-                                      ),
-                                    );
+                                          AcceptRejectProposal(
+                                            proposalId: proposal.id,
+                                            purpose: "reject",
+                                          ),
+                                        );
                                   },
                                 ),
                               ),
@@ -363,11 +362,11 @@ class OrderScreen extends StatelessWidget {
                                   text: AppStrings.labelAccept,
                                   onPressed: () {
                                     context.read<OrderBloc>().add(
-                                      AcceptRejectProposal(
-                                        proposalId: proposal.id,
-                                        purpose: "accept",
-                                      ),
-                                    );
+                                          AcceptRejectProposal(
+                                            proposalId: proposal.id,
+                                            purpose: "accept",
+                                          ),
+                                        );
                                   },
                                 ),
                               ),
@@ -383,17 +382,40 @@ class OrderScreen extends StatelessWidget {
               inProgress ? const SizedBox(height: 10) : SizedBox.shrink(),
               inProgress
                   ? SizedBox(
-                    width: double.infinity,
-                    child: AppButton(
-                      borderRadius: 16,
-                      backgroundColor: Colors.white,
-                      border: BorderSide(width: 1),
-                      textColor: AppColor.black,
-                      text: AppStrings.labelPayment,
-                      onPressed: () {},
-                    ),
-                  )
+                      width: double.infinity,
+                      child: AppButton(
+                        borderRadius: 16,
+                        backgroundColor: Colors.white,
+                        border: BorderSide(width: 1),
+                        textColor: AppColor.black,
+                        text: AppStrings.labelPayment,
+                        onPressed: () {},
+                      ),
+                    )
                   : SizedBox.shrink(),
+
+              // Chat button - show when status is not completed
+              SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: AppButton(
+                  borderRadius: 16,
+                  backgroundColor: AppColor.appColor,
+                  textColor: Colors.white,
+                  text: "Chat with Driver",
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.orderChat,
+                      arguments: {
+                        'bookingId': item.bookingId,
+                        'bookingTitle':
+                            'Booking ${item.bookingId.substring(item.bookingId.length - 5)}',
+                      },
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),

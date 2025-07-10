@@ -1,20 +1,18 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:get_it/get_it.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-
 
 class HomeRepository {
   final WebSocketChannel _channel = GetIt.I<WebSocketChannel>();
 
   Future<void> updateLocationEvent(
-      double lat,
-      double lng,
-      String? locationName,
-      String userId,
-      String status,
-      ) async {
+    double lat,
+    double lng,
+    String? locationName,
+    String userId,
+    String status,
+  ) async {
     final data = {
       "type": "location_update",
       "latitude": lat,

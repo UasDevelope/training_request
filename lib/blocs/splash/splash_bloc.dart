@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:training_request/blocs/splash/splash_event.dart';
 import 'package:training_request/blocs/splash/splash_state.dart';
 import 'package:training_request/services/local/storage.dart';
+import 'package:training_request/utils/socket_utils.dart';
 
 class SplashBloc extends Bloc<SplashEvent, SplashState> {
   SplashBloc() : super(const SplashInitialState()) {
@@ -21,6 +22,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       if (hasToken == null) {
         emit(SplashNavigateToLogin());
       } else {
+        SocketService().initSocket();
         emit(SplashNavigateToHome());
       }
     } catch (e) {

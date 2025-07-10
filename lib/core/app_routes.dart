@@ -9,6 +9,7 @@ import '../screens/auth/loginSucess.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/bottom/bottom.dart';
 import '../screens/chat/inbox.dart';
+import '../screens/order/order_chat_screen.dart';
 import '../screens/splash/splash.dart';
 
 class AppRoutes {
@@ -23,6 +24,7 @@ class AppRoutes {
   static const String transaction=  "/transaction";
   static const String map="/map";
   static const String feedback="/feedback";
+  static const String orderChat="/order-chat";
   static Route<dynamic> onGenerateRoute(RouteSettings setting) {
     switch (setting.name) {
       case splash:
@@ -45,6 +47,14 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_)=>HomeScreen());
       case feedback:
         return MaterialPageRoute(builder: (_)=>FeedbackScreen());
+      case orderChat:
+        final args = setting.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => OrderChatScreen(
+            bookingId: args['bookingId'],
+            bookingTitle: args['bookingTitle'],
+          ),
+        );
       default:
         return MaterialPageRoute(
           builder:
