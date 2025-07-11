@@ -15,22 +15,26 @@ class OrderChatLoading extends OrderChatState {}
 class OrderChatConnected extends OrderChatState {
   final String bookingId;
   final List<OrderChatMessage> messages;
+  final bool shouldScrollToBottom;
   
   const OrderChatConnected({
     required this.bookingId,
     required this.messages,
+    this.shouldScrollToBottom = false,
   });
   
   @override
-  List<Object> get props => [bookingId, messages];
+  List<Object> get props => [bookingId, messages, shouldScrollToBottom];
   
   OrderChatConnected copyWith({
     String? bookingId,
     List<OrderChatMessage>? messages,
+    bool? shouldScrollToBottom,
   }) {
     return OrderChatConnected(
       bookingId: bookingId ?? this.bookingId,
       messages: messages ?? this.messages,
+      shouldScrollToBottom: shouldScrollToBottom ?? this.shouldScrollToBottom,
     );
   }
 }

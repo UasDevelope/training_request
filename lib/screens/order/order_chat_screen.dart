@@ -6,7 +6,6 @@ import 'package:training_request/blocs/order_chat/event.dart';
 import 'package:training_request/blocs/order_chat/state.dart';
 import 'package:training_request/models/order_chat.dart';
 import 'package:training_request/utils/const/app_color.dart';
-import 'package:training_request/utils/const/app_img.dart';
 import 'package:training_request/widgets/app_text.dart';
 import 'package:training_request/widgets/custom_button.dart';
 
@@ -32,7 +31,12 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
   void initState() {
     super.initState();
     // Join chat room when screen opens
-    context.read<OrderChatBloc>().add(JoinChatRoom(bookingId: widget.bookingId));
+    context
+        .read<OrderChatBloc>()
+        .add(JoinChatRoom(bookingId: widget.bookingId));
+    context
+        .read<OrderChatBloc>()
+        .add(FetchChatHistory(bookingId: widget.bookingId));
   }
 
   @override
@@ -40,7 +44,9 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
     _messageController.dispose();
     _scrollController.dispose();
     // Leave chat room when screen closes
-    context.read<OrderChatBloc>().add(LeaveChatRoom(bookingId: widget.bookingId));
+    context
+        .read<OrderChatBloc>()
+        .add(LeaveChatRoom(bookingId: widget.bookingId));
     super.dispose();
   }
 
@@ -48,11 +54,11 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
     final message = _messageController.text.trim();
     if (message.isNotEmpty) {
       context.read<OrderChatBloc>().add(
-        SendChatMessage(
-          message: message,
-          bookingId: widget.bookingId,
-        ),
-      );
+            SendChatMessage(
+              message: message,
+              bookingId: widget.bookingId,
+            ),
+          );
       _messageController.clear();
       _scrollToBottom();
     }
@@ -87,7 +93,8 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
               fontWeight: FontWeight.w600,
             ),
             AppText(
-              text: 'Booking ID: ${widget.bookingId.substring(widget.bookingId.length - 5)}',
+              text:
+                  'Booking ID: ${widget.bookingId.substring(widget.bookingId.length - 5)}',
               color: Colors.white70,
               fontSize: 12,
               fontWeight: FontWeight.w400,
@@ -138,8 +145,8 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
                           text: 'Retry',
                           onPressed: () {
                             context.read<OrderChatBloc>().add(
-                              JoinChatRoom(bookingId: widget.bookingId),
-                            );
+                                  JoinChatRoom(bookingId: widget.bookingId),
+                                );
                           },
                         ),
                       ],
@@ -148,6 +155,9 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
                 }
 
                 if (state is OrderChatConnected) {
+                  if (state.shouldScrollToBottom) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                  }
                   return _buildChatMessages(state.messages);
                 }
 
@@ -181,11 +191,12 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
 
   Widget _buildMessageBubble(OrderChatMessage message) {
     final isMe = message.isMe;
-    
+
     return Container(
       margin: EdgeInsets.only(bottom: 16),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
@@ -202,7 +213,9 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
               decoration: BoxDecoration(
                 color: isMe ? AppColor.appColor : AppColor.whitish,
                 borderRadius: BorderRadius.circular(16),
-                border: isMe ? null : Border.all(color: AppColor.grey.withOpacity(0.3)),
+                border: isMe
+                    ? null
+                    : Border.all(color: AppColor.grey.withOpacity(0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,7 +280,8 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
                 decoration: InputDecoration(
                   hintText: 'Type a message...',
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 maxLines: null,
                 textCapitalization: TextCapitalization.sentences,
@@ -290,4 +304,4 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
       ),
     );
   }
-} 
+}

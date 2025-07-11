@@ -10,6 +10,7 @@ abstract class ApiConstants extends Equatable {
   static get feedback => "$BASEURL/feedback";
   static get fetchBooking => "$BASEURL/Bookings";
   static get getHistory => "$BASEURL/users/transaction-history";
+  static get getChatHistory => "$BASEURL/chat";
 
   static get fetchPendingBookings => "$BASEURL/bookings/user/pending";
   static get fetchInProgressBookings => "$BASEURL/bookings/user/inprogress";

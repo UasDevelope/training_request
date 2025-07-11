@@ -1,8 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:training_request/utils/socket_utils.dart';
 
+import '../../api/api_constants.dart';
+import '../../api/base_api_client.dart';
 import '../../models/order_chat.dart';
 import 'event.dart';
 import 'state.dart';
@@ -19,7 +22,7 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
     on<SendChatMessage>(_onSendChatMessage);
     on<ChatMessageReceived>(_onChatMessageReceived);
     on<LeaveChatRoom>(_onLeaveChatRoom);
-
+    on<FetchChatHistory>(_onFetchChayHistory);
     // Initialize socket
     _initializeSocket();
   }
@@ -76,13 +79,55 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
 
       log('🔌 Joined chat room for booking: ${event.bookingId}');
 
-      emit(OrderChatConnected(
-        bookingId: event.bookingId,
-        messages: List.from(_messages),
-      ));
+      // emit(OrderChatConnected(
+      //   bookingId: event.bookingId,
+      //   messages: List.from(_messages),
+      // ));
     } catch (e) {
       log('❌ Error joining chat room: $e');
       emit(OrderChatError(message: 'Failed to join chat room: $e'));
+    }
+  }
+
+  Future<void> _onFetchChayHistory(
+    FetchChatHistory event,
+    Emitter<OrderChatState> emit,
+  ) async {
+    try {
+      emit(OrderChatLoading());
+
+      log("Comes here");
+      final BaseApiClient apiClient = GetIt.instance<BaseApiClient>();
+      var response = await apiClient
+          .get("${ApiConstants.getChatHistory}/${event.bookingId}");
+      log("Response for the chat is $response");
+      if (response != null && response['messages'] != null) {
+        final List<dynamic> messagesJson = response['messages'];
+        _messages = messagesJson
+            .map((msg) => OrderChatMessage.fromMap(
+                  // Map senderId to userId for compatibility
+                  {
+                    ...msg,
+                    'userId': msg['senderId'],
+                  },
+                  _currentUserId,
+                ))
+            .toList();
+        log("message is ${_messages[5].bookingId}");
+        emit(OrderChatConnected(
+          bookingId: event.bookingId,
+          messages: List.from(_messages),
+          shouldScrollToBottom: true,
+        ));
+      } else {
+        emit(OrderChatConnected(
+          bookingId: event.bookingId,
+          messages: [],
+          shouldScrollToBottom: true,
+        ));
+      }
+    } catch (e) {
+      log("The error is $e");
     }
   }
 
@@ -123,7 +168,7 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
 
       if (state is OrderChatConnected) {
         final currentState = state as OrderChatConnected;
-        emit(currentState.copyWith(messages: List.from(_messages)));
+        emit(currentState.copyWith(messages: List.from(_messages), shouldScrollToBottom: true));
       }
     } catch (e) {
       log('❌ Error sending message: $e');
@@ -151,7 +196,7 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
 
         if (state is OrderChatConnected) {
           final currentState = state as OrderChatConnected;
-          emit(currentState.copyWith(messages: List.from(_messages)));
+          emit(currentState.copyWith(messages: List.from(_messages), shouldScrollToBottom: true));
         }
       }
     } catch (e) {
