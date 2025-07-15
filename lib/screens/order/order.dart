@@ -378,7 +378,6 @@ class OrderScreen extends StatelessWidget {
                   );
                 }),
               const SizedBox(height: 6),
-
               inProgress ? const SizedBox(height: 10) : SizedBox.shrink(),
               inProgress
                   ? SizedBox(
@@ -393,29 +392,29 @@ class OrderScreen extends StatelessWidget {
                       ),
                     )
                   : SizedBox.shrink(),
-
-              // Chat button - show when status is not completed
-              SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: AppButton(
-                  borderRadius: 16,
-                  backgroundColor: AppColor.appColor,
-                  textColor: Colors.white,
-                  text: "Chat with Driver",
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.orderChat,
-                      arguments: {
-                        'bookingId': item.bookingId,
-                        'bookingTitle':
-                            'Booking ${item.bookingId.substring(item.bookingId.length - 5)}',
-                      },
-                    );
-                  },
+              if (inProgress) ...[
+                SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: AppButton(
+                    borderRadius: 16,
+                    backgroundColor: AppColor.appColor,
+                    textColor: Colors.white,
+                    text: "Chat with Driver",
+                    onPressed: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.orderChat,
+                        arguments: {
+                          'bookingId': item.bookingId,
+                          'bookingTitle':
+                              'Booking ${item.bookingId.substring(item.bookingId.length - 5)}',
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
+              ]
             ],
           ),
         ),

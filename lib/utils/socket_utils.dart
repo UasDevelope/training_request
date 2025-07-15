@@ -12,7 +12,6 @@ class SocketService {
   Future<void> initSocket() async {
     try {
       final token = await LocalStorage.getString(LocalStorage.AcessToken);
-
       log('🔌 Connecting to socket with token: $token');
 
       _socket = IO.io(

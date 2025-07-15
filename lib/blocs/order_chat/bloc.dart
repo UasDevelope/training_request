@@ -7,6 +7,8 @@ import 'package:training_request/utils/socket_utils.dart';
 import '../../api/api_constants.dart';
 import '../../api/base_api_client.dart';
 import '../../models/order_chat.dart';
+import '../../services/local/storage.dart';
+import '../../utils/custom_jwt_decoder.dart';
 import 'event.dart';
 import 'state.dart';
 
@@ -14,21 +16,22 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
   final SocketService _socketService = SocketService();
   List<OrderChatMessage> _messages = [];
   String? _currentBookingId;
-  final String _currentUserId = "686e1f18b38e8f476fcd0dc3"; // Dummy user id
+  String _currentUserId = "";
   bool _isSocketInitialized = false;
 
   OrderChatBloc() : super(OrderChatInitial()) {
+    on<FetchChatHistory>(_onFetchChayHistory);
     on<JoinChatRoom>(_onJoinChatRoom);
     on<SendChatMessage>(_onSendChatMessage);
     on<ChatMessageReceived>(_onChatMessageReceived);
     on<LeaveChatRoom>(_onLeaveChatRoom);
-    on<FetchChatHistory>(_onFetchChayHistory);
     // Initialize socket
     _initializeSocket();
   }
 
   Future<void> _initializeSocket() async {
     try {
+      _decodeToken();
       await _socketService.initSocket();
       int attempts = 0;
       while (!_socketService.isReady && attempts < 10) {
@@ -57,6 +60,18 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
     }
   }
 
+  Future<String> _decodeToken() async {
+    final userToken = await LocalStorage.getString(LocalStorage.AcessToken);
+
+    if (userToken != null) {
+      Map<String, dynamic> decodedToken = CustomJwtDecoder.decode(userToken);
+      _currentUserId = decodedToken["id"];
+      log("Current user id is $_currentUserId");
+      return decodedToken["id"];
+    }
+    return "";
+  }
+
   Future<void> _onJoinChatRoom(
     JoinChatRoom event,
     Emitter<OrderChatState> emit,
@@ -64,25 +79,21 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
     try {
       emit(OrderChatLoading());
 
-      // Wait for socket to be initialized
       if (!_isSocketInitialized) {
-        log('⏳ Waiting for socket initialization...');
         await _initializeSocket();
       }
 
       _currentBookingId = event.bookingId;
-      _messages = []; // Clear previous messages, no dummy data
 
-      // Join the chat room
-      _socketService
-          .ensureConnectedAndEmit('joinRoom', {'bookingId': event.bookingId});
+      // ✅ Step 1: Load chat history before clearing or joining
+      add(FetchChatHistory(bookingId: event.bookingId));
+
+      // ✅ Step 2: THEN join room
+      _socketService.ensureConnectedAndEmit('joinRoom', {
+        'bookingId': event.bookingId,
+      });
 
       log('🔌 Joined chat room for booking: ${event.bookingId}');
-
-      // emit(OrderChatConnected(
-      //   bookingId: event.bookingId,
-      //   messages: List.from(_messages),
-      // ));
     } catch (e) {
       log('❌ Error joining chat room: $e');
       emit(OrderChatError(message: 'Failed to join chat room: $e'));
@@ -96,16 +107,16 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
     try {
       emit(OrderChatLoading());
 
-      log("Comes here");
       final BaseApiClient apiClient = GetIt.instance<BaseApiClient>();
       var response = await apiClient
           .get("${ApiConstants.getChatHistory}/${event.bookingId}");
-      log("Response for the chat is $response");
+
       if (response != null && response['messages'] != null) {
         final List<dynamic> messagesJson = response['messages'];
+
+        // ✅ Now clear here (not earlier)
         _messages = messagesJson
             .map((msg) => OrderChatMessage.fromMap(
-                  // Map senderId to userId for compatibility
                   {
                     ...msg,
                     'userId': msg['senderId'],
@@ -113,13 +124,14 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
                   _currentUserId,
                 ))
             .toList();
-        log("message is ${_messages[5].bookingId}");
+
         emit(OrderChatConnected(
           bookingId: event.bookingId,
           messages: List.from(_messages),
           shouldScrollToBottom: true,
         ));
       } else {
+        _messages = [];
         emit(OrderChatConnected(
           bookingId: event.bookingId,
           messages: [],
@@ -127,7 +139,7 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
         ));
       }
     } catch (e) {
-      log("The error is $e");
+      log("❌ Error fetching chat history: $e");
     }
   }
 
@@ -165,11 +177,6 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
       // );
       //
       // _messages.add(newMessage);
-
-      if (state is OrderChatConnected) {
-        final currentState = state as OrderChatConnected;
-        emit(currentState.copyWith(messages: List.from(_messages), shouldScrollToBottom: true));
-      }
     } catch (e) {
       log('❌ Error sending message: $e');
       emit(OrderChatError(message: 'Failed to send message: $e'));
@@ -196,7 +203,8 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
 
         if (state is OrderChatConnected) {
           final currentState = state as OrderChatConnected;
-          emit(currentState.copyWith(messages: List.from(_messages), shouldScrollToBottom: true));
+          emit(currentState.copyWith(
+              messages: List.from(_messages), shouldScrollToBottom: true));
         }
       }
     } catch (e) {
