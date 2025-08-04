@@ -123,4 +123,16 @@ class SocketService {
       log('❌ Error in ensureConnectedAndEmit: $e');
     }
   }
+
+  Future<void> waitUntilReady({int timeoutMs = 5000}) async {
+    int waited = 0;
+    while (!_isConnected && waited < timeoutMs) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      waited += 200;
+    }
+
+    if (!_isConnected) {
+      throw Exception('Socket not ready after waiting $timeoutMs ms');
+    }
+  }
 }

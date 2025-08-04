@@ -13,12 +13,13 @@ class AppTextFormField extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final bool isPhoneField;
+  final TextInputType textInputType;
   final void Function(String)? onCountryChanged;
   final Color hintColor;
   final bool readOnly;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
-  final VoidCallback ?onTap;
+  final VoidCallback? onTap;
   final Color preficColor;
   const AppTextFormField({
     Key? key,
@@ -27,9 +28,10 @@ class AppTextFormField extends StatelessWidget {
     this.prefixIcon,
     this.validator,
     this.onChanged,
+    this.textInputType = TextInputType.text,
     this.isPhoneField = false,
     this.onCountryChanged,
-    this.readOnly=false,
+    this.readOnly = false,
     this.preficColor = AppColor.blue,
     this.isPassword = false,
     this.borderColor = const Color(0xFFE0E0E0),
@@ -42,11 +44,11 @@ class AppTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onTap:onTap,
+      onTap: onTap,
       controller: controller,
-      readOnly:readOnly,
+      readOnly: readOnly,
       obscureText: isPassword,
-      keyboardType: isPhoneField ? TextInputType.phone : TextInputType.text,
+      keyboardType: textInputType,
       style: GoogleFonts.plusJakartaSans(
         fontSize: 18,
         color: textColor,
@@ -55,29 +57,27 @@ class AppTextFormField extends StatelessWidget {
       validator: validator,
       onChanged: onChanged,
       decoration: InputDecoration(
-        prefixIcon:
-            isPhoneField
-                ? CountryCodePicker(
-                  onChanged: (code) => onCountryChanged?.call(code.dialCode!),
-                  initialSelection: 'US',
-                  showFlag: true,
-                  showOnlyCountryWhenClosed: false,
-                  textStyle: TextStyle(color: textColor, fontSize: 16),
-                )
-                : (prefixIcon != null &&
-                        prefixIcon!
-                            .isNotEmpty // ✅ Fixed null check
-                    ? Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Image.asset(
-                        prefixIcon!,
-                        color: preficColor,
-                        height: 20,
-                        width: 20,
-                        fit: BoxFit.contain,
-                      ),
-                    )
-                    : null),
+        prefixIcon: isPhoneField
+            ? CountryCodePicker(
+                onChanged: (code) => onCountryChanged?.call(code.dialCode!),
+                initialSelection: 'US',
+                showFlag: true,
+                showOnlyCountryWhenClosed: false,
+                textStyle: TextStyle(color: textColor, fontSize: 16),
+              )
+            : (prefixIcon != null &&
+                    prefixIcon!.isNotEmpty // ✅ Fixed null check
+                ? Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Image.asset(
+                      prefixIcon!,
+                      color: preficColor,
+                      height: 20,
+                      width: 20,
+                      fit: BoxFit.contain,
+                    ),
+                  )
+                : null),
         hintText: hintText,
         hintStyle: TextStyle(fontSize: 16, color: hintColor),
         filled: true,

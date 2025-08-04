@@ -1,12 +1,10 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:training_request/models/order.dart';
 
-import '../../models/home.dart';
-
-@immutable
 abstract class HomeState extends Equatable {
   const HomeState();
+  @override
   List<Object> get props => [];
 }
 
@@ -19,15 +17,25 @@ class HomeLoadingState extends HomeState {
 }
 
 class HomeLoadedState extends HomeState {
-  final List<HomeModel> homeModel;
-  final Set<Polyline> polyLines; // <- update this line
-  final Set<Marker> marker;
+  final List<OrderModel> orders;
+  final Set<Polyline> polyLines;
+  final Set<Marker> markers;
   final CameraPosition cameraPosition;
-  HomeLoadedState({
-    required this.homeModel,
+
+  const HomeLoadedState({
+    required this.orders,
     required this.cameraPosition,
     required this.polyLines,
-    required this.marker,
+    required this.markers,
   });
-  List<Object> get props => [homeModel, cameraPosition, polyLines, marker];
+
+  @override
+  List<Object> get props => [orders, cameraPosition, polyLines, markers];
+}
+
+class HomeErrorState extends HomeState {
+  final String message;
+  const HomeErrorState(this.message);
+  @override
+  List<Object> get props => [message];
 }

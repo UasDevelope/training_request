@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:get_it/get_it.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -14,16 +12,11 @@ class HomeRepository {
     String status,
   ) async {
     final data = {
-      "type": "location_update",
-      "latitude": lat,
-      "longitude": lng,
-      "userId": userId,
-      "locationName": locationName,
-      "status": status,
+      'latitude': lat,
+      'longitude': lng,
+      'locationName': locationName,
+      'bookingId': "687dcd2a29b7250e22e713ac",
+      'updateType': 'continuous'
     };
-
-    print("📤 Sending WebSocket message: ${jsonEncode(data)}");
-
-    _channel.sink.add(jsonEncode(data));
   }
 }

@@ -17,14 +17,14 @@ class AppRoutes {
   static const String login = '/login';
   static const String loginSucess = "/loginSuccess";
   static const String signup = "/signup";
-  static const String location="/location";
+  static const String location = "/location";
   static const String home = '/home';
-  static const String nav="/nav";
-  static const String chatInbox="/inbox";
-  static const String transaction=  "/transaction";
-  static const String map="/map";
-  static const String feedback="/feedback";
-  static const String orderChat="/order-chat";
+  static const String nav = "/nav";
+  static const String chatInbox = "/inbox";
+  static const String transaction = "/transaction";
+  static const String map = "/map";
+  static const String feedback = "/feedback";
+  static const String orderChat = "/order-chat";
   static Route<dynamic> onGenerateRoute(RouteSettings setting) {
     switch (setting.name) {
       case splash:
@@ -36,17 +36,22 @@ class AppRoutes {
       case signup:
         return MaterialPageRoute(builder: (_) => SignupScreen());
       case location:
-        return MaterialPageRoute(builder: (_)=>LocationScreen());
+        return MaterialPageRoute(builder: (_) => LocationScreen());
       case nav:
-        return MaterialPageRoute(builder: (_)=>BottomNav());
+        return MaterialPageRoute(builder: (_) => BottomNav());
       case chatInbox:
-        return MaterialPageRoute(builder: (_)=>ChatInbox());
+        return MaterialPageRoute(builder: (_) => ChatInbox());
       case transaction:
-        return MaterialPageRoute(builder: (_)=>TransactionHistoryPage());
+        return MaterialPageRoute(builder: (_) => TransactionHistoryPage());
       case map:
-        return MaterialPageRoute(builder: (_)=>HomeScreen());
+        final item = setting.arguments as String;
+
+        return MaterialPageRoute(
+            builder: (_) => HomeScreen(
+                  endPoint: item,
+                ));
       case feedback:
-        return MaterialPageRoute(builder: (_)=>FeedbackScreen());
+        return MaterialPageRoute(builder: (_) => FeedbackScreen());
       case orderChat:
         final args = setting.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
@@ -57,12 +62,11 @@ class AppRoutes {
         );
       default:
         return MaterialPageRoute(
-          builder:
-              (_) => Scaffold(
-                body: Center(
-                  child: Text("No route defined for ${setting.name}"),
-                ),
-              ),
+          builder: (_) => Scaffold(
+            body: Center(
+              child: Text("No route defined for ${setting.name}"),
+            ),
+          ),
         );
     }
   }

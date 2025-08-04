@@ -5,23 +5,23 @@ import 'package:training_request/blocs/chat_user/bloc.dart';
 import 'package:training_request/blocs/chat_user/event.dart';
 import 'package:training_request/blocs/feedback/bloc.dart';
 import 'package:training_request/blocs/home/bloc.dart';
-import 'package:training_request/blocs/home/event.dart';
 import 'package:training_request/blocs/inbox/bloc.dart';
 import 'package:training_request/blocs/inbox/event.dart';
 import 'package:training_request/blocs/location/bloc.dart';
 import 'package:training_request/blocs/nav/bloc.dart';
 import 'package:training_request/blocs/order/bloc.dart';
-import 'package:training_request/blocs/order/event.dart';
 import 'package:training_request/blocs/order_chat/bloc.dart';
 import 'package:training_request/blocs/splash/splash_event.dart';
 import 'package:training_request/repositories/CurrentLocationRepository.dart';
 import 'package:training_request/repositories/auth_repository.dart';
 import 'package:training_request/repositories/booking_repository.dart';
 import 'package:training_request/repositories/feedback.dart';
-import 'package:training_request/repositories/home.dart';
 import 'package:training_request/repositories/location_repository.dart';
 import 'package:training_request/repositories/order_repo.dart';
+import 'package:training_request/utils/socket_utils.dart';
+
 import '../blocs/splash/splash_bloc.dart';
+
 List<BlocProvider> getAppBlocProvider() {
   return [
     BlocProvider<SplashBloc>(
@@ -29,13 +29,12 @@ List<BlocProvider> getAppBlocProvider() {
     ),
     BlocProvider<AuthBloc>(create: (_) => AuthBloc(AuthRepository())),
     BlocProvider<LocationBloc>(
-      create:
-          (_) =>
-              LocationBloc(LocationRepository(), CurrentLocationRepository()),
+      create: (_) =>
+          LocationBloc(LocationRepository(), CurrentLocationRepository()),
     ),
     BlocProvider<NavBloc>(create: (_) => NavBloc()),
     BlocProvider<OrderBloc>(
-      create: (_) => OrderBloc(orderRepository:OrderRepository()),
+      create: (_) => OrderBloc(orderRepository: OrderRepository()),
     ),
     BlocProvider<ChatUserBloc>(
       create: (_) => ChatUserBloc()..add(ChatUserLoadedEvent()),
@@ -43,10 +42,14 @@ List<BlocProvider> getAppBlocProvider() {
     BlocProvider<ChatInboxBloc>(
       create: (_) => ChatInboxBloc()..add(ChatLoadedEvent()),
     ),
-    BlocProvider<HomeBloc>(create: (_) => HomeBloc(currentLocationRepository: CurrentLocationRepository(),homeRepository:HomeRepository())..add(HomeLoadedEvent())),
+    BlocProvider<HomeBloc>(
+        create: (_) => HomeBloc(
+            currentLocationRepository: CurrentLocationRepository(),
+            orderRepository: OrderRepository(),
+            socketService: SocketService())),
     BlocProvider<BookingBloc>(
-      create:
-          (_) => BookingBloc(BookingRepository(), CurrentLocationRepository()),
+      create: (_) =>
+          BookingBloc(BookingRepository(), CurrentLocationRepository()),
     ),
     BlocProvider<FeedbackBloc>(
       create: (_) => FeedbackBloc(FeedbackRepository()),

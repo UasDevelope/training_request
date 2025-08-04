@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -16,23 +18,19 @@
 	<string>training_request</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<!-- If you only need location while the app is in the foreground -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs your location to show nearby services.</string>
-    <key>io.flutter.embedded_views_preview</key>
-    <true/>
-
-    <!-- If you truly need background location, add this one too -->
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app tracks your location even in the background for trip recording.</string>
-
-    <key>CFBundleShortVersionString</key>
+	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app tracks your location even in the background for trip recording.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs your location to show nearby services.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -51,9 +49,18 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app requires access to your location while in use to provide location-based services.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>This app requires access to your location even when the app is in the background to provide continuous location updates.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app uses your location to offer personalized and location-aware services, even when running in the background.</string>
+    <key>UIDeviceFamily</key>
+    <array>
+        <integer>1</integer>
+    </array>
+
 </dict>
 </plist>

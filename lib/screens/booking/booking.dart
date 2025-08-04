@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +14,7 @@ import 'package:training_request/utils/validator.dart';
 import 'package:training_request/widgets/app_text.dart';
 import 'package:training_request/widgets/custom_button.dart';
 import 'package:training_request/widgets/form_field.dart';
+
 import '../../services/dateTime.dart';
 
 class BookingScreen extends StatelessWidget {
@@ -25,7 +27,8 @@ class BookingScreen extends StatelessWidget {
 
   Widget _body(BuildContext context) {
     return BlocBuilder<BookingBloc, BookingStat>(
-      buildWhen: (previous, current) => current is BookingLoading || current is BookingSuccess,
+      buildWhen: (previous, current) =>
+          current is BookingLoading || current is BookingSuccess,
       builder: (context, state) {
         var bookingBloc = context.read<BookingBloc>();
 
@@ -52,7 +55,8 @@ class BookingScreen extends StatelessWidget {
             ToastHelper.showToast(message: state.message);
             bookingBloc.add(ClearController());
           } else if (state is BookingError) {
-            ToastHelper.showToast(message: state.message, type: ToastType.error);
+            ToastHelper.showToast(
+                message: state.message, type: ToastType.error);
             bookingBloc.add(ClearController());
           }
         }
@@ -77,9 +81,15 @@ class BookingScreen extends StatelessWidget {
               SizedBox(height: 12),
               AppTextFormField(
                 onTap: () {},
+                onChanged: (newValue) {
+                  final hours = int.tryParse(newValue) ?? 0;
+                  final totalPrice = hours * 36;
+                  bookingBloc.price.text = totalPrice.toString();
+                },
                 controller: bookingBloc.Nohrs,
                 hintText: AppStrings.enterNoOfHours,
                 validator: AppValidators.validateRequired,
+                textInputType: TextInputType.number,
                 prefixIcon: AppImages.time,
               ),
               const SizedBox(height: 12),
@@ -90,7 +100,8 @@ class BookingScreen extends StatelessWidget {
                 onTap: () async {
                   final picked = await DateTimeHelper.pickDateTime(context);
                   if (picked != null) {
-                    final formatted = DateFormat("dd MMM yyyy – hh:mm a").format(picked);
+                    final formatted =
+                        DateFormat("dd MMM yyyy – hh:mm a").format(picked);
                     bookingBloc.date.text = formatted;
                     log(formatted);
                     bookingBloc.add(UpdateDateTime(dateTime: picked));
@@ -102,6 +113,7 @@ class BookingScreen extends StatelessWidget {
               AppTextFormField(
                 controller: bookingBloc.price,
                 hintText: AppStrings.enterPrice,
+                readOnly: true,
                 validator: AppValidators.validateRequired,
                 prefixIcon: AppImages.coin,
               ),

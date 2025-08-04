@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 abstract class ApiConstants extends Equatable {
-  static get BASEURL => "https://training-syste-be.vercel.app/api";
+  static get BASEURL => "http://54.198.124.181:5000/api";
   static get SocketUrl => "http://54.198.124.181:5000/";
   static get registerTrainerr => '$BASEURL/auth/register';
   static get login => "$BASEURL/auth/login";

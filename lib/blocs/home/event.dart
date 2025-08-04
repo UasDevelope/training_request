@@ -1,26 +1,36 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-@immutable
 abstract class HomeEvent extends Equatable {
   const HomeEvent();
+  @override
   List<Object> get props => [];
 }
 
 class HomeLoadedEvent extends HomeEvent {
-  const HomeLoadedEvent();
-  List<Object> get props => [];
+  final String endPoint;
+  const HomeLoadedEvent({required this.endPoint});
+}
+
+class UpdateLocation extends HomeEvent {
+  final Position position;
+  const UpdateLocation({required this.position});
 }
 
 class UpdateLiveLocationEvent extends HomeEvent {}
 
 class MapControllerInitialized extends HomeEvent {
   final GoogleMapController controller;
-  MapControllerInitialized(this.controller);
+  const MapControllerInitialized(this.controller);
+  @override
+  List<Object> get props => [controller];
 }
+
 class HomeAcceptJobEvent extends HomeEvent {
-  final String bookingId;
-  const HomeAcceptJobEvent(this.bookingId);
-  List<Object> get props => [bookingId];
+  final String proposalId;
+  final String purpose;
+  const HomeAcceptJobEvent({required this.proposalId, required this.purpose});
+  @override
+  List<Object> get props => [proposalId, purpose];
 }

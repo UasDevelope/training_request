@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -73,7 +75,8 @@ class OrderScreen extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: InkWell(
           onTap: () {
-            Navigator.pushNamed(context, AppRoutes.map);
+            log("End point is $endPoint");
+            Navigator.pushNamed(context, AppRoutes.map, arguments: endPoint);
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
