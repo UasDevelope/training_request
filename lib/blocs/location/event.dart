@@ -10,4 +10,9 @@ abstract class LocationEvent extends Equatable {
 class RequestEnableLocation extends LocationEvent {
   const RequestEnableLocation();
 }
+
+class CheckLocationPermission extends LocationEvent {
+  const CheckLocationPermission();
+}
+
 class FetchLocation extends LocationEvent {}

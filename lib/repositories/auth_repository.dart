@@ -70,4 +70,32 @@ class AuthRepository {
     }
     return response;
   }
+
+  Future<void> logout() async {
+    try {
+      // Clear all stored data
+      await LocalStorage.clearAll();
+      log("Logout successful: All data cleared");
+    } catch (e) {
+      log("Error during logout: $e");
+      // Even if there's an error clearing data, we should still proceed with logout
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      log("Attempting to delete account...");
+      // Call the delete account API
+      await _apiClient.delete(ApiConstants.deleteAccount);
+      log("Delete account API call successful");
+      
+      // Clear all stored data after successful deletion
+      await LocalStorage.clearAll();
+      log("Delete account successful: All data cleared");
+    } catch (e) {
+      log("Error during account deletion: $e");
+      rethrow;
+    }
+  }
 }

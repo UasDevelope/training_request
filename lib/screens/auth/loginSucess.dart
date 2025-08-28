@@ -51,7 +51,7 @@ class Loginsucess extends StatelessWidget {
               backgroundColor: AppColor.appColor,
               text: AppStrings.letsExplore,
               onPressed: () {
-                Navigator.pushNamed(context, AppRoutes.location);
+                Navigator.pushNamed(context, AppRoutes.nav);
               },
             ),
           ],

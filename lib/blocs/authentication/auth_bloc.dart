@@ -59,5 +59,30 @@ class AuthBloc extends Bloc<AuthEvents, AuthState> {
         emit(AuthErrorState(message: e.toString()));
       }
     });
+
+    on<LogoutRequest>((event, emit) async {
+      emit(AuthLoadingState());
+      try {
+        await authRepository.logout();
+        emit(const LogoutState());
+        log("Logout successful");
+      } catch (e) {
+        log("Logout error: $e");
+        // Even if logout fails, we should still emit logout state to clear the UI
+        emit(const LogoutState());
+      }
+    });
+
+    on<DeleteAccountRequest>((event, emit) async {
+      emit(AuthLoadingState());
+      try {
+        await authRepository.deleteAccount();
+        emit(const DeleteAccountState());
+        log("Account deletion successful");
+      } catch (e) {
+        log("Account deletion error: $e");
+        emit(AuthErrorState(message: "Failed to delete account. Please try again."));
+      }
+    });
   }
 }

@@ -1,7 +1,7 @@
 class AppStrings {
   static const String welcomeBack = "Welcome Back!";
   static const String welcomeSubtitle =
-      "Lorem ipsum dolor sit amet consectetur. Metus rhoncus elementum sit sed augue.";
+      "Sign in to your account to access your driving training services and track your progress.";
 
   static const String emailOrPhone = "Email or Phone Number";
   static const String enterEmail = "Enter your email";
@@ -25,7 +25,7 @@ class AppStrings {
   // ✅ Added Sign Up related strings
   static const String createYourAccount = "Create your account";
   static const String signupSubtitle =
-      "Lorem ipsum dolor sit amet consectetur. Metus rhoncus elementum sit sed augue.";
+      "Create your account to start your driving training journey with professional instructors.";
   static const String basicInfo = "Basic Info";
 
   static const String fullName = "Full Name";
@@ -52,10 +52,10 @@ class AppStrings {
   static const String alreadyMember = "Already a member?";
   static const String loginHere = "Log In";
 
-  static const String enableLocationTitle = "Enable location";
+  static const String enableLocationTitle = "Training Location";
   static const String enableLocationSubtitle =
-      "To enable location, show we will know your location.";
-  static const String enableButton = "Enable";
+      "This app uses your location to show driving instructors where you're requesting training from, so they can determine if they can reach your area.";
+  static const String enableButton = "Continue";
   static const String welcomeMessage = "👋 Welcome back, {name}!";
   static const String statusActive = "Pending";
   static const String statusSubmitted = "Submitted";
@@ -74,6 +74,7 @@ class AppStrings {
   static const String labelPayment = "Payment";
   static const String labelAccept = "Accept";
   static const String labelReject = "Reject";
+  static const String markComplete = "Mark Complete";
 
   static const String navHome = "Home";
   static const String navBooking = "Booking";
@@ -89,6 +90,20 @@ class AppStrings {
   static const String trainingDetails = "Training Details";
   static const String noOfHours = "No of Hours";
   static const String enterNoOfHours = "No of hours";
+
+  // Logout related strings
+  static const String logout = "Logout";
+  static const String logoutConfirmation = "Are you sure you want to logout?";
+  static const String logoutSuccess = "Logged out successfully";
+  static const String cancel = "Cancel";
+  static const String confirm = "Confirm";
+
+  // Delete account related strings
+  static const String deleteAccount = "Delete Account";
+  static const String deleteAccountConfirmation = "Are you sure you want to delete your account? This action cannot be undone.";
+  static const String deleteAccountWarning = "This will permanently delete your account and all associated data.";
+  static const String deleteAccountSuccess = "Account deleted successfully";
+  static const String deleteAccountError = "Failed to delete account";
 
   static const String date = "Date";
   static const String selectDate = "Select Date";

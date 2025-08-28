@@ -45,3 +45,13 @@ class LoginRequest extends AuthEvents {
   LoginRequest({required this.email, required this.password});
   List<Object> get props => [email, password];
 }
+
+class LogoutRequest extends AuthEvents {
+  const LogoutRequest();
+  List<Object> get props => [];
+}
+
+class DeleteAccountRequest extends AuthEvents {
+  const DeleteAccountRequest();
+  List<Object> get props => [];
+}

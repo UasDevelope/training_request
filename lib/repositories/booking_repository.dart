@@ -30,5 +30,11 @@ class BookingRepository {
     return response;
   }
 
+  Future<Map<String, dynamic>> completeBooking({
+    required String bookingId,
+  }) async {
+    final response = await apiClient.put("${ApiConstants.completeBooking}/$bookingId/complete", {});
+    return response;
+  }
 
 }

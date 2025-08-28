@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:training_request/blocs/chat_user/event.dart';
 
 import 'package:training_request/blocs/chat_user/state.dart';
-import 'package:training_request/dumy/home.dart';
 import 'package:training_request/models/user_model.dart';
 
 import '../../dumy/chat_user.dart';

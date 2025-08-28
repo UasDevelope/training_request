@@ -31,7 +31,7 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
 
   Future<void> _initializeSocket() async {
     try {
-      _decodeToken();
+      await _decodeToken();
       await _socketService.initSocket();
       int attempts = 0;
       while (!_socketService.isReady && attempts < 10) {
@@ -46,6 +46,12 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
         // Listen for incoming messages
         _socketService.on('chatMessage', (data) {
           log('📥 Received chat message: $data');
+          add(ChatMessageReceived(messageData: data));
+        });
+
+        // Also listen for general message events
+        _socketService.on('message', (data) {
+          log('📥 Received general message: $data');
           add(ChatMessageReceived(messageData: data));
         });
 
@@ -189,6 +195,7 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
   ) async {
     try {
       final messageData = event.messageData;
+      log('📥 Processing received message: $messageData');
 
       // Convert socket data to OrderChatMessage
       final newMessage = OrderChatMessage.fromMap(
@@ -196,16 +203,22 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
         _currentUserId,
       );
 
+      log('📥 New message - bookingId: ${newMessage.bookingId}, currentBookingId: $_currentBookingId');
+
       // Only add if it's for the current booking and not a duplicate
       final alreadyExists = _messages.any((msg) => msg.id == newMessage.id);
       if (newMessage.bookingId == _currentBookingId && !alreadyExists) {
         _messages.add(newMessage);
+        log('✅ Added new message to list. Total messages: ${_messages.length}');
 
-        if (state is OrderChatConnected) {
-          final currentState = state as OrderChatConnected;
-          emit(currentState.copyWith(
-              messages: List.from(_messages), shouldScrollToBottom: true));
-        }
+        // Always emit the new state with updated messages
+        emit(OrderChatConnected(
+          bookingId: _currentBookingId!,
+          messages: List.from(_messages),
+          shouldScrollToBottom: true,
+        ));
+      } else {
+        log('⚠️ Message not added - already exists: $alreadyExists, booking mismatch: ${newMessage.bookingId != _currentBookingId}');
       }
     } catch (e) {
       log('❌ Error processing received message: $e');

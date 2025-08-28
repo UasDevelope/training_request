@@ -47,3 +47,17 @@ class UpdateDateTime extends BookingEvent {
 }
 
 class ClearController extends BookingEvent{}
+
+class RequestLocationForBooking extends BookingEvent {
+  const RequestLocationForBooking();
+  List<Object> get props => [];
+}
+
+class CompleteBooking extends BookingEvent {
+  final String bookingId;
+
+  const CompleteBooking({required this.bookingId});
+
+  @override
+  List<Object> get props => [bookingId];
+}

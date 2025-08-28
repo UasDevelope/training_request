@@ -38,18 +38,11 @@ class ChatUsers extends StatelessWidget {
                   const SizedBox(height: 24),
                   Center(child: Image.asset(AppImages.logo, height: 40)),
                   const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppText(
-                          text: "Messages",
-                          color: AppColor.black,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Image.asset(AppImages.edit, height: 25, width: 25),
-                    ],
+                  AppText(
+                    text: "Messages",
+                    color: AppColor.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(

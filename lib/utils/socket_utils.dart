@@ -35,6 +35,13 @@ class SocketService {
       _socket.onDisconnect((_) {
         _isConnected = false;
         log('❌ Socket disconnected');
+        // Try to reconnect after a delay
+        Future.delayed(Duration(seconds: 2), () {
+          if (!_isConnected) {
+            log('🔄 Attempting to reconnect...');
+            _socket.connect();
+          }
+        });
       });
 
       _socket.onConnectError((err) {
@@ -75,12 +82,17 @@ class SocketService {
 
   /// Listen to an event
   Future<void> on(String event, Function(dynamic) callback) async {
-    _socket.off(event);
-    await Future.delayed(Duration(milliseconds: 100));
-    _socket.on(event, (data) {
-      log('📥 Received event [$event]: $data');
-      callback(data);
-    });
+    try {
+      _socket.off(event);
+      await Future.delayed(Duration(milliseconds: 100));
+      _socket.on(event, (data) {
+        log('📥 Received event [$event]: $data');
+        callback(data);
+      });
+      log('✅ Listening for event: $event');
+    } catch (e) {
+      log('❌ Error setting up listener for event [$event]: $e');
+    }
   }
 
   /// Disconnect the socket

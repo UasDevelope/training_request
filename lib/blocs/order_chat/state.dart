@@ -48,4 +48,30 @@ class OrderChatError extends OrderChatState {
   List<Object> get props => [message];
 }
 
-class OrderChatDisconnected extends OrderChatState {} 
+class OrderChatDisconnected extends OrderChatState {}
+
+class MessageDeliveredState extends OrderChatState {
+  final String messageId;
+  final String bookingId;
+  
+  const MessageDeliveredState({
+    required this.messageId,
+    required this.bookingId,
+  });
+  
+  @override
+  List<Object> get props => [messageId, bookingId];
+}
+
+class MessagesReadState extends OrderChatState {
+  final String bookingId;
+  final List<String> messageIds;
+  
+  const MessagesReadState({
+    required this.bookingId,
+    required this.messageIds,
+  });
+  
+  @override
+  List<Object> get props => [bookingId, messageIds];
+} 

@@ -37,6 +37,21 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
     context
         .read<OrderChatBloc>()
         .add(FetchChatHistory(bookingId: widget.bookingId));
+    
+    // Set up periodic refresh to ensure real-time updates
+    _setupPeriodicRefresh();
+  }
+
+  void _setupPeriodicRefresh() {
+    // Refresh chat history every 5 seconds to catch any missed real-time updates
+    Future.delayed(Duration(seconds: 5), () {
+      if (mounted) {
+        context
+            .read<OrderChatBloc>()
+            .add(FetchChatHistory(bookingId: widget.bookingId));
+        _setupPeriodicRefresh(); // Schedule next refresh
+      }
+    });
   }
 
   @override
@@ -105,12 +120,41 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          BlocBuilder<OrderChatBloc, OrderChatState>(
+            builder: (context, state) {
+              return Container(
+                margin: EdgeInsets.only(right: 8),
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: state is OrderChatConnected ? Colors.green : Colors.red,
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.white),
+            onPressed: () {
+              context
+                  .read<OrderChatBloc>()
+                  .add(FetchChatHistory(bookingId: widget.bookingId));
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: BlocBuilder<OrderChatBloc, OrderChatState>(
-              builder: (context, state) {
+            child: BlocListener<OrderChatBloc, OrderChatState>(
+              listener: (context, state) {
+                if (state is OrderChatConnected && state.shouldScrollToBottom) {
+                  _scrollToBottom();
+                }
+              },
+              child: BlocBuilder<OrderChatBloc, OrderChatState>(
+                builder: (context, state) {
                 if (state is OrderChatLoading) {
                   return Center(
                     child: Column(
@@ -155,9 +199,6 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
                 }
 
                 if (state is OrderChatConnected) {
-                  if (state.shouldScrollToBottom) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-                  }
                   return _buildChatMessages(state.messages);
                 }
 
@@ -171,6 +212,7 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
               },
             ),
           ),
+        ),
           _buildMessageInput(),
         ],
       ),

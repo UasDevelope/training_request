@@ -5,11 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:training_request/blocs/order/bloc.dart';
 import 'package:training_request/blocs/order/state.dart';
+import 'package:training_request/blocs/booking/bloc.dart';
+import 'package:training_request/blocs/booking/events.dart';
+import 'package:training_request/blocs/booking/state.dart';
 import 'package:training_request/core/app_routes.dart';
 import 'package:training_request/models/order.dart';
 import 'package:training_request/utils/const/app_color.dart';
 import 'package:training_request/utils/const/app_img.dart';
 import 'package:training_request/utils/const/app_string.dart';
+import 'package:training_request/utils/toast_helper.dart';
 import 'package:training_request/widgets/app_text.dart';
 import 'package:training_request/widgets/custom_button.dart';
 
@@ -33,32 +37,43 @@ class OrderScreen extends StatelessWidget {
   }
 
   Widget _body() {
-    return BlocBuilder<OrderBloc, OrderState>(
-      buildWhen: (previous, current) =>
-          current is OrderLoadingStat ||
-          current is OrderLoadedStat ||
-          current is ProposalLoadingStat ||
-          current is ProposalLoadedStat,
-      builder: (context, state) {
-        if (state is OrderLoadingStat) {
-          return const Center(child: CircularProgressIndicator());
+    return BlocListener<BookingBloc, BookingStat>(
+      listener: (context, state) {
+        if (state is CompleteBookingSuccess) {
+          ToastHelper.showToast(message: state.message);
+          // Refresh the order list after completion
+          context.read<OrderBloc>().add(OrderLoadEvent(endPoint: endPoint));
+        } else if (state is CompleteBookingError) {
+          ToastHelper.showToast(message: state.message, type: ToastType.error);
         }
-        if (state is OrderLoadedStat) {
-          return ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            shrinkWrap: true,
-            itemCount: state.orderModel.length,
-            itemBuilder: (context, index) {
-              final order = state.orderModel;
-              return _orderCard(order[index], context, inProgress, inSubmitted);
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return SizedBox(height: 1);
-            },
-          );
-        }
-        return const SizedBox();
       },
+      child: BlocBuilder<OrderBloc, OrderState>(
+        buildWhen: (previous, current) =>
+            current is OrderLoadingStat ||
+            current is OrderLoadedStat ||
+            current is ProposalLoadingStat ||
+            current is ProposalLoadedStat,
+        builder: (context, state) {
+          if (state is OrderLoadingStat) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is OrderLoadedStat) {
+            return ListView.separated(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              shrinkWrap: true,
+              itemCount: state.orderModel.length,
+              itemBuilder: (context, index) {
+                final order = state.orderModel;
+                return _orderCard(order[index], context, inProgress, inSubmitted);
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return SizedBox(height: 1);
+              },
+            );
+          }
+          return SizedBox();
+        },
+      ),
     );
   }
 
@@ -172,8 +187,7 @@ class OrderScreen extends StatelessWidget {
               Row(
                 children: [
                   Image.asset(
-                    AppImages.calendar,
-                    height: 30,
+                    AppImages.calendar, height: 30,
                     color: AppColor.blue,
                   ),
                   const SizedBox(width: 6),
@@ -387,11 +401,14 @@ class OrderScreen extends StatelessWidget {
                       width: double.infinity,
                       child: AppButton(
                         borderRadius: 16,
-                        backgroundColor: Colors.white,
-                        border: BorderSide(width: 1),
-                        textColor: AppColor.black,
-                        text: AppStrings.labelPayment,
-                        onPressed: () {},
+                        backgroundColor: Colors.green,
+                        textColor: Colors.white,
+                        text: AppStrings.markComplete,
+                        onPressed: () {
+                          context.read<BookingBloc>().add(
+                            CompleteBooking(bookingId: item.bookingId),
+                          );
+                        },
                       ),
                     )
                   : SizedBox.shrink(),

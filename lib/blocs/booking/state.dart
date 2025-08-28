@@ -42,3 +42,30 @@ class BookingError extends BookingStat {
   @override
   List<Object> get props => [message];
 }
+
+class LocationObtainedForBooking extends BookingStat {
+  final double lat;
+  final double long;
+  final String locationName;
+  const LocationObtainedForBooking({
+    required this.lat,
+    required this.long,
+    required this.locationName,
+  });
+  @override
+  List<Object> get props => [lat, long, locationName];
+}
+
+class CompleteBookingSuccess extends BookingStat {
+  final String message;
+  const CompleteBookingSuccess({required this.message});
+  @override
+  List<Object> get props => [message];
+}
+
+class CompleteBookingError extends BookingStat {
+  final String message;
+  const CompleteBookingError({required this.message});
+  @override
+  List<Object> get props => [message];
+}

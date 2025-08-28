@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+ import 'package:equatable/equatable.dart';
 
 abstract class ApiConstants extends Equatable {
   static get BASEURL => "http://54.198.124.181:5000/api";
@@ -16,6 +16,8 @@ abstract class ApiConstants extends Equatable {
   static get fetchInProgressBookings => "$BASEURL/bookings/user/inprogress";
   static get fetchCompletedBookings => "$BASEURL/bookings/user/completed";
   static get fetchSubmittedBookings => "$BASEURL/bookings/user/submitted";
-  static get socketChannel => "wss://training-syste-be.vercel.app";
+  static get completeBooking => "$BASEURL/bookings";
+  static get socketChannel => "http://54.198.124.181:5000/";
   static get updateLocationEvent => "updateLocation";
+  static get deleteAccount => "/auth/delete";
 }

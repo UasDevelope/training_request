@@ -44,3 +44,11 @@ class AuthErrorState extends AuthState {
 class SignupSubmitState extends AuthState {}
 
 class LoginState extends AuthState {}
+
+class LogoutState extends AuthState {
+  const LogoutState();
+}
+
+class DeleteAccountState extends AuthState {
+  const DeleteAccountState();
+}

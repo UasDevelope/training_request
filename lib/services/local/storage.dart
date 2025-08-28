@@ -10,4 +10,7 @@ class LocalStorage {
       await flutterSecureStorage.read(key: key);
   static Future<void> deleteString(String key) async =>
       flutterSecureStorage.delete(key: key);
+      
+  static Future<void> clearAll() async =>
+      flutterSecureStorage.deleteAll();
 }

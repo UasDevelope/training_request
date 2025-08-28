@@ -47,6 +47,36 @@ class ChatMessageReceived extends OrderChatEvent {
   List<Object> get props => [messageData];
 }
 
+class MessageDelivered extends OrderChatEvent {
+  final String messageId;
+  final String bookingId;
+
+  const MessageDelivered({
+    required this.messageId,
+    required this.bookingId,
+  });
+
+  @override
+  List<Object> get props => [messageId, bookingId];
+}
+
+class MessagesRead extends OrderChatEvent {
+  final String bookingId;
+  final List<String> messageIds;
+
+  const MessagesRead({
+    required this.bookingId,
+    required this.messageIds,
+  });
+
+  @override
+  List<Object> get props => [bookingId, messageIds];
+}
+
+class ConnectToChat extends OrderChatEvent {
+  const ConnectToChat();
+}
+
 class LeaveChatRoom extends OrderChatEvent {
   final String bookingId;
 

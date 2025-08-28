@@ -22,10 +22,24 @@ class BookingBloc extends Bloc<BookingEvent, BookingStat> {
     : super(BookingInitialState()) {
     on<CreateBooking>((event, emit) async {
       emit(BookingLoading());
-      final (lat, long, locationName) =
-          await currentLocationRepository.getCurrentLocation();
-
+      
       try {
+        // Try to get location, but don't fail if user hasn't granted permission
+        double lat = 0.0;
+        double long = 0.0;
+        String locationName = "Location not provided";
+        
+        try {
+          final (latitude, longitude, locName) =
+              await currentLocationRepository.getCurrentLocation();
+          lat = latitude;
+          long = longitude;
+          locationName = locName;
+        } catch (locationError) {
+          log("Location not available: $locationError");
+          // Continue without location
+        }
+
         var response = await bookingRepository.bookingRequest(
           hours: event.NoHrs,
           date: event.date,
@@ -51,6 +65,30 @@ class BookingBloc extends Bloc<BookingEvent, BookingStat> {
       log("Selected date: $formatted");
     });
     on<ClearController>(clearController);
+    
+    on<RequestLocationForBooking>((event, emit) async {
+      try {
+        final (lat, long, locationName) =
+            await currentLocationRepository.getCurrentLocation();
+        emit(LocationObtainedForBooking(lat: lat, long: long, locationName: locationName));
+      } catch (e) {
+        emit(BookingError(message: "Location not available. You can continue without location."));
+      }
+    });
+    
+    on<CompleteBooking>((event, emit) async {
+      emit(BookingLoading());
+      try {
+        final response = await bookingRepository.completeBooking(
+          bookingId: event.bookingId,
+        );
+        emit(CompleteBookingSuccess(message: response["message"]));
+      } on BadExceptionRequest catch (e) {
+        emit(CompleteBookingError(message: e.message));
+      } catch (e) {
+        emit(CompleteBookingError(message: e.toString()));
+      }
+    });
   }
 
   void clearController(ClearController event, Emitter<BookingStat> emit) {

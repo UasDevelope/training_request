@@ -26,16 +26,25 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app uses your location to track your driving training sessions, find nearby instructors and training centers, record trip data for progress monitoring, and provide location-based training services.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app tracks your location even in the background for trip recording.</string>
+	<string>This app uses your location to track your driving training sessions in real-time, record trip data for progress monitoring, and provide location-based training services even when the app is in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs your location to show nearby services.</string>
+	<string>This app uses your location to find nearby driving instructors, track your training sessions, and provide location-based services like finding training centers and recording your driving routes.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>UIStatusBarStyle</key>
+	<string></string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -51,16 +60,5 @@
 	</array>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app requires access to your location while in use to provide location-based services.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app requires access to your location even when the app is in the background to provide continuous location updates.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>This app uses your location to offer personalized and location-aware services, even when running in the background.</string>
-    <key>UIDeviceFamily</key>
-    <array>
-        <integer>1</integer>
-    </array>
-
 </dict>
 </plist>
