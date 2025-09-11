@@ -7,7 +7,10 @@ part 'state.dart';
 
 class FeedbackBloc extends Bloc<FeedbackEvent, FeedbackState> {
   FeedbackRepository feedbackRepository;
-  FeedbackBloc(this.feedbackRepository) : super(FeedbackState.initial()) {
+  String? bookingId;
+  
+  FeedbackBloc(this.feedbackRepository, {this.bookingId}) : super(FeedbackState.initial()) {
+    print('🔍 Feedback BLoC - Booking ID: $bookingId');
     on<RatingChanged>((event, emit) {
       emit(state.copyWith(rating: event.rating));
     });
@@ -22,13 +25,17 @@ class FeedbackBloc extends Bloc<FeedbackEvent, FeedbackState> {
       try {
         // Simulated delay for submission
         await Future.delayed(Duration(seconds: 1));
-        feedbackRepository.submitFeedback(
-          bookingId: "bookingId",
+        print('🔍 Submitting feedback - Booking ID: ${bookingId ?? "unknown"}');
+        await feedbackRepository.submitFeedback(
+          bookingId: bookingId ?? "unknown",
           rating: state.rating,
-          comments: state.comment,
+          comment: state.comment,
         );
-      } catch (_) {
-        emit(state.copyWith(isSubmitting: false, error: 'Failed to submit.'));
+        
+        emit(state.copyWith(isSubmitting: false, success: true));
+      } catch (e) {
+        print('❌ Feedback submission error: $e');
+        emit(state.copyWith(isSubmitting: false, error: 'Failed to submit: $e'));
       }
     });
   }

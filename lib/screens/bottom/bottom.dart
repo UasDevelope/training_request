@@ -19,7 +19,7 @@ class BottomNav extends StatelessWidget {
     final List<Widget> screens = [
       TabarScreen(),
       BookingScreen(),
-      ChatUsers(),
+      // ChatUsers(),
       SettingsScreen(),
     ];
 

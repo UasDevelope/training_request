@@ -1,81 +1,86 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-import 'package:training_request/utils/socket_utils.dart';
-
-import '../../api/api_constants.dart';
-import '../../api/base_api_client.dart';
 import '../../models/order_chat.dart';
+import '../../repositories/chat_repository.dart';
 import '../../services/local/storage.dart';
-import '../../utils/custom_jwt_decoder.dart';
+
 import 'event.dart';
 import 'state.dart';
 
 class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
-  final SocketService _socketService = SocketService();
+  final ChatRepository _chatRepository = ChatRepository();
+  
   List<OrderChatMessage> _messages = [];
   String? _currentBookingId;
-  String _currentUserId = "";
-  bool _isSocketInitialized = false;
+  String? _currentUserId;
+  StreamSubscription<Map<String, dynamic>>? _messageSubscription;
+  StreamSubscription<Map<String, dynamic>>? _typingSubscription;
+  StreamSubscription<Map<String, dynamic>>? _statusSubscription;
+  StreamSubscription<Map<String, dynamic>>? _locationSubscription;
+  StreamSubscription<String>? _errorSubscription;
+  StreamSubscription<bool>? _connectionSubscription;
 
   OrderChatBloc() : super(OrderChatInitial()) {
-    on<FetchChatHistory>(_onFetchChayHistory);
+    on<FetchChatHistory>(_onFetchChatHistory);
     on<JoinChatRoom>(_onJoinChatRoom);
     on<SendChatMessage>(_onSendChatMessage);
     on<ChatMessageReceived>(_onChatMessageReceived);
+    on<ConnectToChat>(_onConnectToChat);
     on<LeaveChatRoom>(_onLeaveChatRoom);
-    // Initialize socket
-    _initializeSocket();
+    on<StartTyping>(_onStartTyping);
+    on<StopTyping>(_onStopTyping);
+    on<MarkMessagesAsRead>(_onMarkMessagesAsRead);
+    on<UpdateLocation>(_onUpdateLocation);
   }
 
-  Future<void> _initializeSocket() async {
-    try {
-      await _decodeToken();
-      await _socketService.initSocket();
-      int attempts = 0;
-      while (!_socketService.isReady && attempts < 10) {
-        await Future.delayed(Duration(milliseconds: 500));
-        attempts++;
-        log('⏳ Waiting for socket to be ready... attempt $attempts');
+  void _setupSocketListeners() {
+    // Listen for incoming messages
+    _messageSubscription = _chatRepository.messageStream.listen((data) {
+      add(ChatMessageReceived(messageData: data));
+    });
+
+    // Listen for typing indicators
+    _typingSubscription = _chatRepository.typingStream.listen((data) {
+      // Handle typing indicators
+      log('⌨️ Typing event: $data');
+    });
+
+    // Listen for message status updates
+    _statusSubscription = _chatRepository.statusStream.listen((data) {
+      // Handle message status updates (sent, delivered, read)
+      log('📨 Status update: $data');
+    });
+
+    // Listen for location updates
+    _locationSubscription = _chatRepository.locationStream.listen((data) {
+      // Handle location updates
+      log('📍 Location update: $data');
+    });
+
+    // Listen for errors
+    _errorSubscription = _chatRepository.errorStream.listen((error) {
+      log('❌ Socket error: $error');
+      add(ChatMessageReceived(messageData: {'error': error}));
+    });
+
+    // Listen for connection status
+    _connectionSubscription = _chatRepository.connectionStream.listen((connected) {
+      log('🔌 Connection status: $connected');
+      if (!connected) {
+        add(ChatMessageReceived(messageData: {'error': 'Socket connection lost'}));
       }
-
-      if (_socketService.isReady) {
-        _isSocketInitialized = true;
-
-        // Listen for incoming messages
-        _socketService.on('chatMessage', (data) {
-          log('📥 Received chat message: $data');
-          add(ChatMessageReceived(messageData: data));
-        });
-
-        // Also listen for general message events
-        _socketService.on('message', (data) {
-          log('📥 Received general message: $data');
-          add(ChatMessageReceived(messageData: data));
-        });
-
-        log('✅ Socket initialized successfully');
-      } else {
-        log('❌ Socket failed to initialize after $attempts attempts');
-        _isSocketInitialized = false;
-      }
-    } catch (e) {
-      log('❌ Error initializing socket: $e');
-      _isSocketInitialized = false;
-    }
+    });
   }
 
-  Future<String> _decodeToken() async {
-    final userToken = await LocalStorage.getString(LocalStorage.AcessToken);
-
-    if (userToken != null) {
-      Map<String, dynamic> decodedToken = CustomJwtDecoder.decode(userToken);
-      _currentUserId = decodedToken["id"];
-      log("Current user id is $_currentUserId");
-      return decodedToken["id"];
-    }
-    return "";
+  void _disposeSocketListeners() {
+    _messageSubscription?.cancel();
+    _typingSubscription?.cancel();
+    _statusSubscription?.cancel();
+    _locationSubscription?.cancel();
+    _errorSubscription?.cancel();
+    _connectionSubscription?.cancel();
   }
 
   Future<void> _onJoinChatRoom(
@@ -85,67 +90,69 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
     try {
       emit(OrderChatLoading());
 
-      if (!_isSocketInitialized) {
-        await _initializeSocket();
-      }
-
       _currentBookingId = event.bookingId;
 
-      // ✅ Step 1: Load chat history before clearing or joining
-      add(FetchChatHistory(bookingId: event.bookingId));
+      // ✅ Step 1: Check chat availability
+      try {
+        final availability = await _chatRepository.checkChatAvailability(event.bookingId);
+        if (availability['allowed'] != true) {
+          emit(OrderChatError(message: availability['reason'] ?? 'Chat not available for this booking'));
+          return;
+        }
+      } catch (e) {
+        log('❌ Error checking chat availability: $e');
+        emit(OrderChatError(message: 'Failed to check chat availability. Please try again.'));
+        return;
+      }
 
-      // ✅ Step 2: THEN join room
-      _socketService.ensureConnectedAndEmit('joinRoom', {
-        'bookingId': event.bookingId,
-      });
+      // ✅ Step 2: Initialize socket if not already connected
+      if (!_chatRepository.isSocketConnected && !_chatRepository.isSocketConnecting) {
+        final socketInitialized = await _chatRepository.initializeSocket();
+        if (!socketInitialized) {
+          emit(OrderChatError(message: 'Failed to connect to chat server. Please check your internet connection.'));
+          return;
+        }
+        _setupSocketListeners();
+      }
+
+      // ✅ Step 3: Join chat room via socket
+      final joinedRoom = await _chatRepository.joinChatRoom(event.bookingId);
+      if (!joinedRoom) {
+        emit(OrderChatError(message: 'Failed to join chat room. Please try again.'));
+        return;
+      }
+
+      // ✅ Step 4: Load chat history
+      add(FetchChatHistory(bookingId: event.bookingId));
 
       log('🔌 Joined chat room for booking: ${event.bookingId}');
     } catch (e) {
       log('❌ Error joining chat room: $e');
-      emit(OrderChatError(message: 'Failed to join chat room: $e'));
+      emit(OrderChatError(message: 'Failed to join chat room. Please try again.'));
     }
   }
 
-  Future<void> _onFetchChayHistory(
+  Future<void> _onFetchChatHistory(
     FetchChatHistory event,
     Emitter<OrderChatState> emit,
   ) async {
     try {
       emit(OrderChatLoading());
 
-      final BaseApiClient apiClient = GetIt.instance<BaseApiClient>();
-      var response = await apiClient
-          .get("${ApiConstants.getChatHistory}/${event.bookingId}");
+      // Get current user ID
+      _currentUserId = await _getCurrentUserId();
 
-      if (response != null && response['messages'] != null) {
-        final List<dynamic> messagesJson = response['messages'];
+      // Fetch chat history from API
+      _messages = await _chatRepository.getChatHistory(event.bookingId);
 
-        // ✅ Now clear here (not earlier)
-        _messages = messagesJson
-            .map((msg) => OrderChatMessage.fromMap(
-                  {
-                    ...msg,
-                    'userId': msg['senderId'],
-                  },
-                  _currentUserId,
-                ))
-            .toList();
-
-        emit(OrderChatConnected(
-          bookingId: event.bookingId,
-          messages: List.from(_messages),
-          shouldScrollToBottom: true,
-        ));
-      } else {
-        _messages = [];
-        emit(OrderChatConnected(
-          bookingId: event.bookingId,
-          messages: [],
-          shouldScrollToBottom: true,
-        ));
-      }
+      emit(OrderChatConnected(
+        bookingId: event.bookingId,
+        messages: List.from(_messages),
+        shouldScrollToBottom: true,
+      ));
     } catch (e) {
       log("❌ Error fetching chat history: $e");
+      emit(OrderChatError(message: 'Failed to load chat history: $e'));
     }
   }
 
@@ -154,38 +161,81 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
     Emitter<OrderChatState> emit,
   ) async {
     try {
-      // Ensure socket is initialized
-      if (!_isSocketInitialized) {
-        log('⏳ Waiting for socket initialization...');
-        await _initializeSocket();
+      if (event.message.trim().isEmpty) {
+        log('❌ Cannot send empty message');
+        return;
       }
 
-      // Send message via socket
-      _socketService.ensureConnectedAndEmit('chatMessage', {
-        'bookingId': event.bookingId,
-        'message': event.message,
-      });
+      log('📤 Sending message: ${event.message}');
+      
+      // Create temporary message for immediate UI update
+      final tempMessage = OrderChatMessage(
+        id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+        message: event.message.trim(),
+        userId: _currentUserId ?? 'unknown',
+        senderName: 'You',
+        senderRole: 'customer',
+        timestamp: DateTime.now(),
+        status: 'sending',
+        bookingId: event.bookingId,
+        isMe: true,
+      );
+      
+      _messages.add(tempMessage);
+      
+      // Update UI immediately
+      emit(OrderChatConnected(
+        bookingId: event.bookingId,
+        messages: List.from(_messages),
+        shouldScrollToBottom: true,
+      ));
+      
+      // Send message via socket (preferred) or API (fallback)
+      bool messageSent = false;
+      
+      try {
+        messageSent = await _chatRepository.sendMessageViaSocket(event.message, event.bookingId);
+        if (messageSent) {
+          log('📤 Message sent via socket');
+          // Update temp message status to sent
+          final index = _messages.indexWhere((msg) => msg.id == tempMessage.id);
+          if (index != -1) {
+            _messages[index] = _messages[index].copyWith(status: 'sent');
+          }
+        }
+      } catch (socketError) {
+        log('⚠️ Socket failed, trying API: $socketError');
+      }
 
-      log('📤 Sent message: ${event.message}');
+      // Fallback to API if socket failed
+      if (!messageSent) {
+        try {
+          final sentMessage = await _chatRepository.sendMessageViaAPI(event.message, event.bookingId);
+          // Replace temp message with real message
+          final index = _messages.indexWhere((msg) => msg.id == tempMessage.id);
+          if (index != -1) {
+            _messages[index] = sentMessage;
+          }
+          log('📤 Message sent via API');
+        } catch (apiError) {
+          log('❌ Both socket and API failed: $apiError');
+          // Remove temp message on failure
+          _messages.removeWhere((msg) => msg.id == tempMessage.id);
+          emit(OrderChatError(message: 'Failed to send message. Please check your connection and try again.'));
+          return;
+        }
+      }
+      
+      // Update UI with final state
+      emit(OrderChatConnected(
+        bookingId: event.bookingId,
+        messages: List.from(_messages),
+        shouldScrollToBottom: true,
+      ));
 
-      // Optimistic update: add message locally with a temp id
-      // final tempId = DateTime.now().millisecondsSinceEpoch.toString();
-      // final newMessage = OrderChatMessage(
-      //   id: tempId,
-      //   userId: _currentUserId,
-      //   senderName: 'You',
-      //   senderRole: 'user',
-      //   message: event.message,
-      //   timestamp: DateTime.now(),
-      //   status: 'sending',
-      //   bookingId: event.bookingId,
-      //   isMe: true,
-      // );
-      //
-      // _messages.add(newMessage);
     } catch (e) {
       log('❌ Error sending message: $e');
-      emit(OrderChatError(message: 'Failed to send message: $e'));
+      emit(OrderChatError(message: 'Failed to send message. Please try again.'));
     }
   }
 
@@ -195,41 +245,97 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
   ) async {
     try {
       final messageData = event.messageData;
-      log('📥 Processing received message: $messageData');
+      log('📥 Received chat message: $messageData');
+
+      // Handle error messages
+      if (messageData.containsKey('error')) {
+        log('❌ Received error message: ${messageData['error']}');
+        emit(OrderChatError(message: messageData['error']));
+        return;
+      }
+
+      // Validate message data
+      if (messageData.isEmpty) {
+        log('⚠️ Received empty message data');
+        return;
+      }
+
+      // Handle different message formats from socket
+      Map<String, dynamic> processedData = messageData;
+      
+      // If the message is nested in a 'data' field
+      if (messageData.containsKey('data')) {
+        processedData = messageData['data'];
+      }
+      
+      // If the message is nested in a 'message' field
+      if (messageData.containsKey('message')) {
+        processedData = messageData['message'];
+      }
+
+      // Ensure we have the required fields
+      if (!processedData.containsKey('message') || !processedData.containsKey('bookingId')) {
+        log('⚠️ Invalid message format: $processedData');
+        return;
+      }
 
       // Convert socket data to OrderChatMessage
       final newMessage = OrderChatMessage.fromMap(
-        messageData,
-        _currentUserId,
+        processedData,
+        _currentUserId ?? 'unknown',
       );
 
-      log('📥 New message - bookingId: ${newMessage.bookingId}, currentBookingId: $_currentBookingId');
-
+      // Check for duplicates by ID or content + timestamp
+      final existingMessageById = _messages.any((msg) => msg.id == newMessage.id);
+      final existingMessageByContent = _messages.any((msg) => 
+        msg.message == newMessage.message && 
+        msg.timestamp.difference(newMessage.timestamp).abs().inSeconds < 5
+      );
+      
       // Only add if it's for the current booking and not a duplicate
-      final alreadyExists = _messages.any((msg) => msg.id == newMessage.id);
-      if (newMessage.bookingId == _currentBookingId && !alreadyExists) {
+      if (newMessage.bookingId == _currentBookingId && !existingMessageById && !existingMessageByContent) {
         _messages.add(newMessage);
-        log('✅ Added new message to list. Total messages: ${_messages.length}');
+        log('✅ Added new real-time message. Total messages: ${_messages.length}');
 
-        // Always emit the new state with updated messages
+        // Update UI immediately
         emit(OrderChatConnected(
           bookingId: _currentBookingId!,
           messages: List.from(_messages),
           shouldScrollToBottom: true,
         ));
       } else {
-        log('⚠️ Message not added - already exists: $alreadyExists, booking mismatch: ${newMessage.bookingId != _currentBookingId}');
+        log('⚠️ Message not added - duplicate: $existingMessageById, content duplicate: $existingMessageByContent, booking mismatch: ${newMessage.bookingId != _currentBookingId}');
       }
     } catch (e) {
       log('❌ Error processing received message: $e');
     }
   }
 
+
+
+  Future<void> _onConnectToChat(
+    ConnectToChat event,
+    Emitter<OrderChatState> emit,
+  ) async {
+    try {
+      log('🔌 Initializing socket connection...');
+      await _chatRepository.initializeSocket();
+      _setupSocketListeners();
+      log('✅ Socket connection initialized');
+    } catch (e) {
+      log('❌ Error connecting to chat: $e');
+      emit(OrderChatError(message: 'Failed to connect to chat: $e'));
+    }
+  }
+
+
+
   Future<void> _onLeaveChatRoom(
     LeaveChatRoom event,
     Emitter<OrderChatState> emit,
   ) async {
     try {
+      await _chatRepository.leaveChatRoom();
       _currentBookingId = null;
       _messages.clear();
 
@@ -241,9 +347,91 @@ class OrderChatBloc extends Bloc<OrderChatEvent, OrderChatState> {
     }
   }
 
+  Future<void> _onStartTyping(
+    StartTyping event,
+    Emitter<OrderChatState> emit,
+  ) async {
+    try {
+      await _chatRepository.startTyping(event.bookingId);
+    } catch (e) {
+      log('❌ Error starting typing: $e');
+    }
+  }
+
+  Future<void> _onStopTyping(
+    StopTyping event,
+    Emitter<OrderChatState> emit,
+  ) async {
+    try {
+      await _chatRepository.stopTyping(event.bookingId);
+    } catch (e) {
+      log('❌ Error stopping typing: $e');
+    }
+  }
+
+  Future<void> _onMarkMessagesAsRead(
+    MarkMessagesAsRead event,
+    Emitter<OrderChatState> emit,
+  ) async {
+    try {
+      await _chatRepository.markMessagesAsRead(event.messageIds, event.bookingId);
+    } catch (e) {
+      log('❌ Error marking messages as read: $e');
+    }
+  }
+
+  Future<void> _onUpdateLocation(
+    UpdateLocation event,
+    Emitter<OrderChatState> emit,
+  ) async {
+    try {
+      await _chatRepository.updateLocation(
+        latitude: event.latitude,
+        longitude: event.longitude,
+        locationName: event.locationName,
+        bookingId: event.bookingId,
+        updateType: event.updateType,
+      );
+    } catch (e) {
+      log('❌ Error updating location: $e');
+    }
+  }
+
+  /// Simulate incoming message for testing real-time functionality
+  void simulateIncomingMessage(String message, {String? senderName, String? senderRole}) {
+    if (_currentBookingId == null) return;
+    
+    final simulatedMessage = {
+      'id': 'sim_${DateTime.now().millisecondsSinceEpoch}',
+      'message': message,
+      'userId': 'simulated_user_${DateTime.now().millisecondsSinceEpoch}',
+      'senderName': senderName ?? 'Test User',
+      'senderRole': senderRole ?? 'customer',
+      'timestamp': DateTime.now().toIso8601String(),
+      'status': 'sent',
+      'bookingId': _currentBookingId,
+    };
+    
+    log('🧪 Simulating incoming message: $message');
+    add(ChatMessageReceived(messageData: simulatedMessage));
+  }
+
+  Future<String> _getCurrentUserId() async {
+    try {
+      // For now, we'll use a default user ID
+      // In a real implementation, you might extract this from the JWT token
+      // or store it separately during login
+      return 'user_123';
+    } catch (e) {
+      log('❌ Error getting current user ID: $e');
+      return 'unknown_user';
+    }
+  }
+
   @override
   Future<void> close() {
-    _socketService.disconnect();
+    _disposeSocketListeners();
+    _chatRepository.dispose();
     return super.close();
   }
 }

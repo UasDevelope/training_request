@@ -68,7 +68,7 @@ class ApiClientImpl implements BaseApiClient {
   Future<dynamic> delete(String endpoint, {bool auth = true}) async {
     final token =
         auth ? await LocalStorage.getString(LocalStorage.AcessToken) : null;
-    final uri = Uri.parse(ApiConstants.BASEURL + endpoint);
+    final uri = Uri.parse(endpoint);
 
     log("➡️ [DELETE] $uri");
     final response = await _client.delete(uri, headers: _headers(token ?? ''));

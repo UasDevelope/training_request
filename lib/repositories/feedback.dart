@@ -9,12 +9,12 @@ class FeedbackRepository {
   Future<Map<String, dynamic>> submitFeedback({
     required String bookingId,
     required int rating,
-    String? comments,
+    String? comment,
   }) async {
     final body = {
       'bookingId': bookingId,
       'rating': rating,
-      if (comments != null) 'comments': comments,
+      if (comment != null) 'comment': comment,
     };
 
     final response = await apiClient.post(

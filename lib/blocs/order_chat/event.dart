@@ -47,32 +47,6 @@ class ChatMessageReceived extends OrderChatEvent {
   List<Object> get props => [messageData];
 }
 
-class MessageDelivered extends OrderChatEvent {
-  final String messageId;
-  final String bookingId;
-
-  const MessageDelivered({
-    required this.messageId,
-    required this.bookingId,
-  });
-
-  @override
-  List<Object> get props => [messageId, bookingId];
-}
-
-class MessagesRead extends OrderChatEvent {
-  final String bookingId;
-  final List<String> messageIds;
-
-  const MessagesRead({
-    required this.bookingId,
-    required this.messageIds,
-  });
-
-  @override
-  List<Object> get props => [bookingId, messageIds];
-}
-
 class ConnectToChat extends OrderChatEvent {
   const ConnectToChat();
 }
@@ -84,4 +58,54 @@ class LeaveChatRoom extends OrderChatEvent {
 
   @override
   List<Object> get props => [bookingId];
+}
+
+class StartTyping extends OrderChatEvent {
+  final String bookingId;
+
+  const StartTyping({required this.bookingId});
+
+  @override
+  List<Object> get props => [bookingId];
+}
+
+class StopTyping extends OrderChatEvent {
+  final String bookingId;
+
+  const StopTyping({required this.bookingId});
+
+  @override
+  List<Object> get props => [bookingId];
+}
+
+class MarkMessagesAsRead extends OrderChatEvent {
+  final List<String> messageIds;
+  final String bookingId;
+
+  const MarkMessagesAsRead({
+    required this.messageIds,
+    required this.bookingId,
+  });
+
+  @override
+  List<Object> get props => [messageIds, bookingId];
+}
+
+class UpdateLocation extends OrderChatEvent {
+  final double latitude;
+  final double longitude;
+  final String locationName;
+  final String bookingId;
+  final String updateType;
+
+  const UpdateLocation({
+    required this.latitude,
+    required this.longitude,
+    required this.locationName,
+    required this.bookingId,
+    this.updateType = 'manual',
+  });
+
+  @override
+  List<Object> get props => [latitude, longitude, locationName, bookingId, updateType];
 }

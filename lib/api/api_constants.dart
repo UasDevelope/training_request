@@ -2,15 +2,20 @@
 
 abstract class ApiConstants extends Equatable {
   static get BASEURL => "http://54.198.124.181:5000/api";
-  static get SocketUrl => "http://54.198.124.181:5000/";
+  static get SocketUrl => "http://54.198.124.181:5000";
   static get registerTrainerr => '$BASEURL/auth/register';
   static get login => "$BASEURL/auth/login";
   static get updateLocation => "$BASEURL/users/location";
   static get makeBooking => "$BASEURL/bookings";
   static get feedback => "$BASEURL/feedback";
+  static get userProfile => "$BASEURL/users/profile";
+  static get updateUserProfile => "$BASEURL/users/profile";
   static get fetchBooking => "$BASEURL/Bookings";
   static get getHistory => "$BASEURL/users/transaction-history";
   static get getChatHistory => "$BASEURL/chat";
+  static get chatAvailability => "$BASEURL/chat";
+  static get sendMessage => "$BASEURL/chat";
+  static get deleteMessage => "$BASEURL/chat";
 
   static get fetchPendingBookings => "$BASEURL/bookings/user/pending";
   static get fetchInProgressBookings => "$BASEURL/bookings/user/inprogress";
@@ -19,5 +24,5 @@ abstract class ApiConstants extends Equatable {
   static get completeBooking => "$BASEURL/bookings";
   static get socketChannel => "http://54.198.124.181:5000/";
   static get updateLocationEvent => "updateLocation";
-  static get deleteAccount => "/auth/delete";
+  static get deleteAccount => "$BASEURL/auth/delete";
 }

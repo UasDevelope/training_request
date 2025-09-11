@@ -1,17 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:training_request/utils/const/app_img.dart';
-
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
-
   const CustomBottomNavBar({
     super.key,
     required this.selectedIndex,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,13 +22,11 @@ class CustomBottomNavBar extends StatelessWidget {
         children: [
           _buildNavItem(AppImages.home, "Home", 0),
           _buildNavItem(AppImages.calendar, "Booking", 1),
-          _buildNavItem(AppImages.chat, "Chat", 2),
-          _buildNavItem(AppImages.setting, "Setting", 3),
+          _buildNavItem(AppImages.setting, "Setting", 2),
         ],
       ),
     );
   }
-
   Widget _buildNavItem(String icon, String label, int index) {
     final isSelected = index == selectedIndex;
     return GestureDetector(
@@ -39,8 +34,13 @@ class CustomBottomNavBar extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(icon, color: isSelected ? Colors.green : Colors.grey,height:30,width:30,),
-          const SizedBox(height: 4),
+          Image.asset(
+            icon,
+            color: isSelected ? Colors.green : Colors.grey,
+            height: 30,
+            width: 30,
+          ),
+          SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(

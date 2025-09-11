@@ -5,12 +5,30 @@ import 'package:training_request/utils/const/app_color.dart';
 import 'package:training_request/utils/const/app_img.dart';
 import 'package:training_request/widgets/app_text.dart';
 import '../../blocs/feedback/bloc.dart';
+import '../../repositories/feedback.dart';
 class FeedbackScreen extends StatelessWidget {
+  final String? bookingId;
+  
+  const FeedbackScreen({Key? key, this.bookingId}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: BlocBuilder<FeedbackBloc, FeedbackState>(
+    print('🔍 Feedback Screen - Booking ID: $bookingId');
+    return BlocProvider(
+      create: (context) => FeedbackBloc(
+        FeedbackRepository(),
+        bookingId: bookingId,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: BlocListener<FeedbackBloc, FeedbackState>(
+        listener: (context, state) {
+          if (state.success) {
+            // Navigate back after successful submission
+            Navigator.pop(context);
+          }
+        },
+        child: BlocBuilder<FeedbackBloc, FeedbackState>(
         builder: (context, state) {
           final bloc = context.read<FeedbackBloc>();
           return Padding(
@@ -66,6 +84,22 @@ class FeedbackScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (state.error != null) ...[
+                  SizedBox(height: 16),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red[200]!),
+                    ),
+                    child: Text(
+                      state.error!,
+                      style: TextStyle(color: Colors.red[700]),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
                 Spacer(),
                 ElevatedButton(
                   onPressed:
@@ -90,6 +124,7 @@ class FeedbackScreen extends StatelessWidget {
           );
         },
       ),
-    );
+    )));
   }
 }
+

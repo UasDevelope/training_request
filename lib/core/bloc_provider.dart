@@ -18,7 +18,7 @@ import 'package:training_request/repositories/booking_repository.dart';
 import 'package:training_request/repositories/feedback.dart';
 import 'package:training_request/repositories/location_repository.dart';
 import 'package:training_request/repositories/order_repo.dart';
-import 'package:training_request/utils/socket_utils.dart';
+
 
 import '../blocs/splash/splash_bloc.dart';
 
@@ -45,8 +45,7 @@ List<BlocProvider> getAppBlocProvider() {
     BlocProvider<HomeBloc>(
         create: (_) => HomeBloc(
             currentLocationRepository: CurrentLocationRepository(),
-            orderRepository: OrderRepository(),
-            socketService: SocketService())),
+            orderRepository: OrderRepository())),
     BlocProvider<BookingBloc>(
       create: (_) =>
           BookingBloc(BookingRepository(), CurrentLocationRepository()),

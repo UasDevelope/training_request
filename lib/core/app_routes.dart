@@ -3,6 +3,7 @@ import 'package:training_request/screens/auth/signUp.dart';
 import 'package:training_request/screens/feedback_screen/feedback.dart';
 import 'package:training_request/screens/home/home.dart';
 import 'package:training_request/screens/location/location.dart';
+import 'package:training_request/screens/profile/user_profile_screen.dart';
 
 import '../screens/Transaction/transaction.dart';
 import '../screens/auth/loginSucess.dart';
@@ -51,7 +52,12 @@ class AppRoutes {
                   endPoint: item,
                 ));
       case feedback:
-        return MaterialPageRoute(builder: (_) => FeedbackScreen());
+        final args = setting.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (_) => FeedbackScreen(
+            bookingId: args?['bookingId'],
+          ),
+        );
       case orderChat:
         final args = setting.arguments as Map<String, dynamic>;
         return MaterialPageRoute(

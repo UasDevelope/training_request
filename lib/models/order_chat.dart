@@ -22,16 +22,19 @@ class OrderChatMessage {
   });
 
   factory OrderChatMessage.fromMap(Map<String, dynamic> map, String currentUserId) {
+    // According to the specification, server sends 'senderId'
+    final senderId = (map['senderId'] ?? map['userId'] ?? '').toString();
+    
     return OrderChatMessage(
-      id: map['_id'] ?? '',
-      userId: map['userId'] ?? '',
-      senderName: map['senderName'] ?? '',
-      senderRole: map['senderRole'] ?? '',
-      message: map['message'] ?? '',
-      timestamp: DateTime.tryParse(map['timestamp'] ?? '') ?? DateTime.now(),
-      status: map['status'] ?? '',
-      bookingId: map['bookingId'] ?? '',
-      isMe: map['userId'] == currentUserId,
+      id: (map['_id'] ?? map['id'] ?? '').toString(),
+      userId: senderId,
+      senderName: (map['senderName'] ?? '').toString(),
+      senderRole: (map['senderRole'] ?? '').toString(),
+      message: (map['message'] ?? '').toString(),
+      timestamp: DateTime.tryParse((map['timestamp'] ?? '').toString()) ?? DateTime.now(),
+      status: (map['status'] ?? 'sent').toString(),
+      bookingId: (map['bookingId'] ?? '').toString(),
+      isMe: senderId == currentUserId,
     );
   }
 
@@ -46,5 +49,29 @@ class OrderChatMessage {
       'status': status,
       'bookingId': bookingId,
     };
+  }
+
+  OrderChatMessage copyWith({
+    String? id,
+    String? userId,
+    String? senderName,
+    String? senderRole,
+    String? message,
+    DateTime? timestamp,
+    String? status,
+    String? bookingId,
+    bool? isMe,
+  }) {
+    return OrderChatMessage(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      senderName: senderName ?? this.senderName,
+      senderRole: senderRole ?? this.senderRole,
+      message: message ?? this.message,
+      timestamp: timestamp ?? this.timestamp,
+      status: status ?? this.status,
+      bookingId: bookingId ?? this.bookingId,
+      isMe: isMe ?? this.isMe,
+    );
   }
 } 

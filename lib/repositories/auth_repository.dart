@@ -86,6 +86,11 @@ class AuthRepository {
   Future<void> deleteAccount() async {
     try {
       log("Attempting to delete account...");
+      
+      // Get the current token for debugging
+      final token = await LocalStorage.getString(LocalStorage.AcessToken);
+      log("Current token: ${token?.substring(0, 20)}...");
+      
       // Call the delete account API
       await _apiClient.delete(ApiConstants.deleteAccount);
       log("Delete account API call successful");

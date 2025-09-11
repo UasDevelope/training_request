@@ -30,28 +30,10 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Join chat room when screen opens
-    context
-        .read<OrderChatBloc>()
-        .add(JoinChatRoom(bookingId: widget.bookingId));
-    context
-        .read<OrderChatBloc>()
-        .add(FetchChatHistory(bookingId: widget.bookingId));
-    
-    // Set up periodic refresh to ensure real-time updates
-    _setupPeriodicRefresh();
-  }
-
-  void _setupPeriodicRefresh() {
-    // Refresh chat history every 5 seconds to catch any missed real-time updates
-    Future.delayed(Duration(seconds: 5), () {
-      if (mounted) {
-        context
-            .read<OrderChatBloc>()
-            .add(FetchChatHistory(bookingId: widget.bookingId));
-        _setupPeriodicRefresh(); // Schedule next refresh
-      }
-    });
+    // Load chat messages and connect to chat
+    context.read<OrderChatBloc>().add(FetchChatHistory(bookingId: widget.bookingId));
+    context.read<OrderChatBloc>().add(ConnectToChat());
+    context.read<OrderChatBloc>().add(JoinChatRoom(bookingId: widget.bookingId));
   }
 
   @override
@@ -132,14 +114,6 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
                   color: state is OrderChatConnected ? Colors.green : Colors.red,
                 ),
               );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.refresh, color: Colors.white),
-            onPressed: () {
-              context
-                  .read<OrderChatBloc>()
-                  .add(FetchChatHistory(bookingId: widget.bookingId));
             },
           ),
         ],
@@ -328,6 +302,9 @@ class _OrderChatScreenState extends State<OrderChatScreen> {
                 maxLines: null,
                 textCapitalization: TextCapitalization.sentences,
                 onSubmitted: (_) => _sendMessage(),
+                onChanged: (text) {
+                  // Simple text chat - no typing indicators needed
+                },
               ),
             ),
           ),

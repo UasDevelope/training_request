@@ -11,14 +11,14 @@ import 'package:training_request/repositories/CurrentLocationRepository.dart';
 import 'package:training_request/utils/const/app_img.dart';
 
 import '../../repositories/order_repo.dart';
-import '../../utils/socket_utils.dart';
+
 import 'event.dart';
 import 'state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final CurrentLocationRepository currentLocationRepository;
   final OrderRepository orderRepository;
-  final SocketService socketService;
+
   Position? _lastPosition;
   LatLng? _driverLatLng;
   List<OrderModel> _orders = [];
@@ -30,52 +30,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({
     required this.currentLocationRepository,
     required this.orderRepository,
-    required this.socketService,
   }) : super(const HomeInitialState()) {
     on<HomeLoadedEvent>(_onLoadHomeData);
     on<UpdateLiveLocationEvent>(_onUpdateLiveLocation);
     on<UpdateLocation>(_onUpdateLocation);
     on<MapControllerInitialized>(_onMapControllerInitialized);
     on<HomeAcceptJobEvent>(_onAcceptJob);
-
-    _initSocketListener();
   }
 
-  void _initSocketListener() async {
-    try {
-      await socketService.initSocket();
-      socketService
-          .emit('trackBooking', {'bookingId': "6880ba6e37501160f81886bc"});
 
-      socketService.on('error', (data) {
-        log("Socket error: $data");
-      });
-      socketService.on('receiveLocation', (data) {
-        log("Received location: $data");
-      });
-      // socketService.on('locationUpdated', (data) {
-      //   if (data != null && data['location'] != null) {
-      //     add(UpdateLocation(
-      //       position: Position(
-      //         latitude: data['location']['latitude']?.toDouble() ?? 0.0,
-      //         longitude: data['location']['longitude']?.toDouble() ?? 0.0,
-      //         timestamp: DateTime.now(),
-      //         accuracy: 0,
-      //         altitude: 0,
-      //         heading: 0,
-      //         speed: 0,
-      //         speedAccuracy: 0,
-      //         altitudeAccuracy: 0,
-      //         headingAccuracy: 0,
-      //       ),
-      //     ));
-      //   }
-      // });
-    } catch (e) {
-      log("Socket initialization failed: $e");
-      emit(const HomeErrorState("Failed to connect to server"));
-    }
-  }
 
   void startLiveTracking() {
     const locationSettings = LocationSettings(
@@ -110,11 +73,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final orders = await orderRepository.fetchBookings(event.endPoint);
       _orders = orders;
 
-      // Cache location details and join socket rooms
-      await socketService.waitUntilReady();
+      // Cache location details
       for (var order in orders) {
         if (order.bookingId.isNotEmpty) {
-          // socketService.emit('trackBooking', {'bookingId': order.bookingId});
+          // Track booking locally
         }
         if (order.location.coordinates.length >= 2) {
           try {
@@ -209,16 +171,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           await currentLocationRepository.getCurrentLocation();
       _driverLatLng = LatLng(lat, long);
 
-      // Emit location update for each order
+      // Update location locally for each order
       for (final order in _orders) {
         if (order.bookingId.isNotEmpty) {
-          socketService.emit('updateLocation', {
-            'latitude': lat,
-            'longitude': long,
-            'locationName': locationName,
-            'bookingId': order.bookingId,
-            'updateType': 'continuous',
-          });
+          log('📍 Location updated for booking ${order.bookingId}: $lat, $long');
         }
       }
 

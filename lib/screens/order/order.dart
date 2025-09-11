@@ -16,10 +16,11 @@ import 'package:training_request/utils/const/app_string.dart';
 import 'package:training_request/utils/toast_helper.dart';
 import 'package:training_request/widgets/app_text.dart';
 import 'package:training_request/widgets/custom_button.dart';
+import 'package:training_request/api/api_constants.dart';
 
 import '../../blocs/order/event.dart';
 
-class OrderScreen extends StatelessWidget {
+class OrderScreen extends StatefulWidget {
   final String endPoint;
   final bool inProgress;
   final bool inSubmitted;
@@ -31,8 +32,15 @@ class OrderScreen extends StatelessWidget {
   });
 
   @override
+  State<OrderScreen> createState() => _OrderScreenState();
+}
+
+class _OrderScreenState extends State<OrderScreen> {
+  String? _completedBookingId;
+
+  @override
   Widget build(BuildContext context) {
-    context.read<OrderBloc>().add(OrderLoadEvent(endPoint: endPoint));
+    context.read<OrderBloc>().add(OrderLoadEvent(endPoint: widget.endPoint));
     return Scaffold(backgroundColor: Colors.white, body: _body());
   }
 
@@ -42,7 +50,13 @@ class OrderScreen extends StatelessWidget {
         if (state is CompleteBookingSuccess) {
           ToastHelper.showToast(message: state.message);
           // Refresh the order list after completion
-          context.read<OrderBloc>().add(OrderLoadEvent(endPoint: endPoint));
+          context.read<OrderBloc>().add(OrderLoadEvent(endPoint: widget.endPoint));
+          // Navigate to rating screen after successful completion
+          Future.delayed(Duration(milliseconds: 500), () {
+            Navigator.pushNamed(context, AppRoutes.feedback, arguments: {
+              'bookingId': _completedBookingId, // Pass the completed booking ID
+            });
+          });
         } else if (state is CompleteBookingError) {
           ToastHelper.showToast(message: state.message, type: ToastType.error);
         }
@@ -64,7 +78,7 @@ class OrderScreen extends StatelessWidget {
               itemCount: state.orderModel.length,
               itemBuilder: (context, index) {
                 final order = state.orderModel;
-                return _orderCard(order[index], context, inProgress, inSubmitted);
+                return _orderCard(order[index], context, widget.inProgress, widget.inSubmitted);
               },
               separatorBuilder: (BuildContext context, int index) {
                 return SizedBox(height: 1);
@@ -90,8 +104,17 @@ class OrderScreen extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: InkWell(
           onTap: () {
-            log("End point is $endPoint");
-            Navigator.pushNamed(context, AppRoutes.map, arguments: endPoint);
+            log("End point is ${widget.endPoint}");
+            
+            // If this is a completed booking, navigate to rating screen
+            if (widget.endPoint == ApiConstants.fetchCompletedBookings) {
+              Navigator.pushNamed(context, AppRoutes.feedback, arguments: {
+                'bookingId': item.bookingId,
+              });
+            } else {
+              // For other booking statuses, navigate to map screen
+              Navigator.pushNamed(context, AppRoutes.map, arguments: widget.endPoint);
+            }
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,6 +428,7 @@ class OrderScreen extends StatelessWidget {
                         textColor: Colors.white,
                         text: AppStrings.markComplete,
                         onPressed: () {
+                          _completedBookingId = item.bookingId;
                           context.read<BookingBloc>().add(
                             CompleteBooking(bookingId: item.bookingId),
                           );
