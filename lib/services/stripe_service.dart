@@ -95,9 +95,9 @@ class StripeService {
   /// Complete payment process - creates intent, initializes sheet, and displays it
   Future<bool> makePayment({
     required String amount,
-    String currency = 'PKR',
-    String merchantDisplayName = 'The Coder Brain',
-    String countryCode = 'PK',
+    String currency = 'USD',
+    String merchantDisplayName = 'Training Request',
+    String countryCode = 'US',
     bool testEnvironment = true,
   }) async {
     try {

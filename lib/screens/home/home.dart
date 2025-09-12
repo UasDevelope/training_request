@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:training_request/screens/home/tripCard.dart';
 import 'package:training_request/utils/const/app_color.dart';
 import 'package:training_request/widgets/custom_button.dart';
+import 'package:training_request/widgets/empty_state_widget.dart';
 
 import '../../blocs/home/bloc.dart';
 import '../../blocs/home/event.dart';
@@ -92,6 +93,39 @@ class _HomeScreenState extends State<HomeScreen> {
           }
           if (state is HomeLoadedState) {
             context.read<HomeBloc>().startLiveTracking();
+            
+            // Show empty state if no orders
+            if (state.orders.isEmpty) {
+              return Stack(
+                children: [
+                  // Google Map
+                  Positioned.fill(
+                    child: GoogleMap(
+                      polylines: state.polyLines,
+                      initialCameraPosition: _initialPosition,
+                      zoomControlsEnabled: true,
+                      myLocationEnabled: true,
+                      indoorViewEnabled: true,
+                      markers: state.markers,
+                      onMapCreated: (controller) {
+                        _mapController = controller;
+                        context
+                            .read<HomeBloc>()
+                            .add(MapControllerInitialized(controller));
+                      },
+                    ),
+                  ),
+                  // Empty state overlay
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.white.withOpacity(0.9),
+                      child: const PendingEmptyState(),
+                    ),
+                  ),
+                ],
+              );
+            }
+            
             return Stack(
               children: [
                 // Google Map

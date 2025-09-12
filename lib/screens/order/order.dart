@@ -16,6 +16,7 @@ import 'package:training_request/utils/const/app_string.dart';
 import 'package:training_request/utils/toast_helper.dart';
 import 'package:training_request/widgets/app_text.dart';
 import 'package:training_request/widgets/custom_button.dart';
+import 'package:training_request/widgets/empty_state_widget.dart';
 import 'package:training_request/api/api_constants.dart';
 
 import '../../blocs/order/event.dart';
@@ -120,6 +121,11 @@ class _OrderScreenState extends State<OrderScreen> {
             );
           }
           if (state is OrderLoadedStat) {
+            // Show empty state if no orders
+            if (state.orderModel.isEmpty) {
+              return _getEmptyState();
+            }
+            
             return ListView.separated(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               shrinkWrap: true,
@@ -137,6 +143,19 @@ class _OrderScreenState extends State<OrderScreen> {
         },
       ),
     );
+  }
+
+  Widget _getEmptyState() {
+    // Determine which empty state to show based on the current tab
+    if (widget.inSubmitted) {
+      return const SubmittedEmptyState();
+    } else if (widget.inProgress) {
+      return const InProgressEmptyState();
+    } else if (widget.endPoint.contains('completed')) {
+      return const CompletedEmptyState();
+    } else {
+      return const PendingEmptyState();
+    }
   }
 
   Widget _orderCard(
