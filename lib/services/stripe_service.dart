@@ -50,7 +50,7 @@ class StripeService {
   /// Initialize the payment sheet with the given parameters
   Future<bool> initializePaymentSheet({
     required String clientSecret,
-    String merchantDisplayName = 'Training Reques',
+    String merchantDisplayName = 'Training Request',
     String countryCode = 'US',
     String currencyCode = 'USD',
     bool testEnvironment = true,
