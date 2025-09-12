@@ -23,7 +23,8 @@ class FetchLocationDetailsEvent extends OrderEvent {
 class AcceptRejectProposal extends OrderEvent{
   String proposalId;
   String purpose;
-  AcceptRejectProposal({required this.proposalId,required this.purpose});
+  double? price; // Add price for payment processing
+  AcceptRejectProposal({required this.proposalId,required this.purpose, this.price});
   @override
-  List<Object> get props => [proposalId,purpose];
+  List<Object> get props => [proposalId,purpose, price ?? 0.0];
 }

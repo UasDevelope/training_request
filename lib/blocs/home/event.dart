@@ -30,7 +30,8 @@ class MapControllerInitialized extends HomeEvent {
 class HomeAcceptJobEvent extends HomeEvent {
   final String proposalId;
   final String purpose;
-  const HomeAcceptJobEvent({required this.proposalId, required this.purpose});
+  final double? price; // Add price for payment processing
+  const HomeAcceptJobEvent({required this.proposalId, required this.purpose, this.price});
   @override
-  List<Object> get props => [proposalId, purpose];
+  List<Object> get props => [proposalId, purpose, price ?? 0.0];
 }

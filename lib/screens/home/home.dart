@@ -60,6 +60,36 @@ class _HomeScreenState extends State<HomeScreen> {
           if (state is HomeErrorState) {
             return Center(child: Text(state.message));
           }
+          if (state is HomePaymentProcessingState) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (state is HomePaymentSuccessState) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.green),
+                  ),
+                ],
+              ),
+            );
+          }
           if (state is HomeLoadedState) {
             context.read<HomeBloc>().startLiveTracking();
             return Stack(

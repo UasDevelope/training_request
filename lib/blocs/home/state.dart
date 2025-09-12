@@ -39,3 +39,17 @@ class HomeErrorState extends HomeState {
   @override
   List<Object> get props => [message];
 }
+
+class HomePaymentProcessingState extends HomeState {
+  final String message;
+  const HomePaymentProcessingState(this.message);
+  @override
+  List<Object> get props => [message];
+}
+
+class HomePaymentSuccessState extends HomeState {
+  final String message;
+  const HomePaymentSuccessState(this.message);
+  @override
+  List<Object> get props => [message];
+}

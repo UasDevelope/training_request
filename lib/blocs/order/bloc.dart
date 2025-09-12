@@ -4,6 +4,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:training_request/api/api_constants.dart';
 import 'package:training_request/blocs/order/state.dart';
 import 'package:training_request/repositories/order_repo.dart';
+import 'package:training_request/services/stripe_service.dart';
 import 'event.dart';
 
 class OrderBloc extends Bloc<OrderEvent, OrderState> {
@@ -62,6 +63,33 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   ) async {
     emit(ProposalLoadingStat());
     try {
+      // If it's an accept action and price is provided, process payment first
+      if (event.purpose == 'accept' && event.price != null) {
+        emit(ProposalPaymentProcessingStat("Initializing payment..."));
+        
+        // Initialize Stripe service
+        final stripeService = StripeService();
+        
+        // Process payment
+        emit(ProposalPaymentProcessingStat("Opening payment sheet..."));
+        final paymentSuccess = await stripeService.makePayment(
+          amount: event.price!.toString(),
+          currency: 'PKR',
+          merchantDisplayName: 'Training Request App',
+          countryCode: 'PK',
+          testEnvironment: true,
+        );
+        
+        if (!paymentSuccess) {
+          emit(OrderErrorStat(message: "Payment failed. Please try again."));
+          return;
+        }
+        
+        // Payment successful, now call the accept API
+        emit(ProposalPaymentSuccessStat("Payment successful! Processing booking..."));
+      }
+      
+      // Call the accept/reject API
       var response = await orderRepository.proposalAcceptReject(
         "${ApiConstants.BASEURL}/bookings/proposals/${event.proposalId}/${event.purpose}",
       );

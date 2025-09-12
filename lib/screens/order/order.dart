@@ -66,10 +66,58 @@ class _OrderScreenState extends State<OrderScreen> {
             current is OrderLoadingStat ||
             current is OrderLoadedStat ||
             current is ProposalLoadingStat ||
-            current is ProposalLoadedStat,
+            current is ProposalLoadedStat ||
+            current is ProposalPaymentProcessingStat ||
+            current is ProposalPaymentSuccessStat ||
+            current is OrderErrorStat,
         builder: (context, state) {
           if (state is OrderLoadingStat) {
             return const Center(child: CircularProgressIndicator());
+          }
+          if (state is ProposalPaymentProcessingStat) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (state is ProposalPaymentSuccessStat) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.green),
+                  ),
+                ],
+              ),
+            );
+          }
+          if (state is OrderErrorStat) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, color: Colors.red, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    state.message,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.red),
+                  ),
+                ],
+              ),
+            );
           }
           if (state is OrderLoadedStat) {
             return ListView.separated(
@@ -405,6 +453,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                           AcceptRejectProposal(
                                             proposalId: proposal.id,
                                             purpose: "accept",
+                                            price: proposal.price,
                                           ),
                                         );
                                   },

@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:training_request/models/order.dart';
 import 'package:training_request/repositories/CurrentLocationRepository.dart';
 import 'package:training_request/utils/const/app_img.dart';
+import 'package:training_request/services/stripe_service.dart';
 
 import '../../repositories/order_repo.dart';
 
@@ -255,10 +256,38 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _onAcceptJob(
       HomeAcceptJobEvent event, Emitter<HomeState> emit) async {
     try {
+      // If it's an accept action and price is provided, process payment first
+      if (event.purpose == 'accept' && event.price != null) {
+        emit(const HomePaymentProcessingState("Initializing payment..."));
+        
+        // Initialize Stripe service
+        final stripeService = StripeService();
+        
+        // Process payment
+        emit(const HomePaymentProcessingState("Opening payment sheet..."));
+        final paymentSuccess = await stripeService.makePayment(
+          amount: event.price!.toString(),
+          currency: 'PKR',
+          merchantDisplayName: 'Training Request App',
+          countryCode: 'PK',
+          testEnvironment: true,
+        );
+        
+        if (!paymentSuccess) {
+          emit(const HomeErrorState("Payment failed. Please try again."));
+          return;
+        }
+        
+        // Payment successful, now call the accept API
+        emit(const HomePaymentSuccessState("Payment successful! Processing booking..."));
+      }
+      
+      // Call the accept/reject API
       final success = await orderRepository.proposalAcceptReject(
           event.purpose == 'accept'
               ? '/accept/${event.proposalId}'
               : '/reject/${event.proposalId}');
+              
       if (success) {
         add(const HomeLoadedEvent(
             endPoint: 'inProgressBookings')); // Refresh orders

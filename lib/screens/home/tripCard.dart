@@ -248,6 +248,7 @@ class TripCard extends StatelessWidget {
                                     HomeAcceptJobEvent(
                                       proposalId: proposal.id,
                                       purpose: "accept",
+                                      price: proposal.price,
                                     ),
                                   );
                             },

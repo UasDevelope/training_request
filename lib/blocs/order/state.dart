@@ -71,3 +71,17 @@ class LocationError extends OrderState {
   @override
   List<Object> get props => [message];
 }
+
+class ProposalPaymentProcessingStat extends OrderState {
+  final String message;
+  const ProposalPaymentProcessingStat(this.message);
+  @override
+  List<Object> get props => [message];
+}
+
+class ProposalPaymentSuccessStat extends OrderState {
+  final String message;
+  const ProposalPaymentSuccessStat(this.message);
+  @override
+  List<Object> get props => [message];
+}
