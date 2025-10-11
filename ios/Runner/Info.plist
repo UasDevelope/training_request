@@ -32,6 +32,8 @@
 	<string>This app uses your location to track your driving training sessions in real-time, record trip data for progress monitoring, and provide location-based training services even when the app is in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app uses your location to find nearby driving instructors, track your training sessions, and provide location-based services like finding training centers and recording your driving routes.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses the camera to capture photos for your driving training profile, document training sessions, and share images with your instructor during training sessions.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIDeviceFamily</key>
@@ -60,5 +62,16 @@
 	</array>
 	<key>io.flutter.embedded_views_preview</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>stripe</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>stripe</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

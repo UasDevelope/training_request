@@ -40,6 +40,14 @@ class StripeService {
           });
 
       log('Payment intent response: ${response.statusCode}');
+      log('Payment intent response body: ${response.body}');
+      
+      if (response.statusCode != 200) {
+        log('Payment intent creation failed with status: ${response.statusCode}');
+        log('Error response: ${response.body}');
+        return null;
+      }
+      
       return jsonDecode(response.body);
     } catch (e) {
       log('Error creating payment intent: $e');

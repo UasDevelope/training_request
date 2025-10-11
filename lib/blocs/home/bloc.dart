@@ -267,9 +267,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         emit(const HomePaymentProcessingState("Opening payment sheet..."));
         final paymentSuccess = await stripeService.makePayment(
           amount: event.price!.toString(),
-          currency: 'PKR',
+          currency: 'USD',
           merchantDisplayName: 'Training Request App',
-          countryCode: 'PK',
+          countryCode: 'US',
           testEnvironment: true,
         );
         

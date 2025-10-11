@@ -74,9 +74,9 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
         emit(ProposalPaymentProcessingStat("Opening payment sheet..."));
         final paymentSuccess = await stripeService.makePayment(
           amount: event.price!.toString(),
-          currency: 'PKR',
+          currency: 'USD',
           merchantDisplayName: 'Training Request App',
-          countryCode: 'PK',
+          countryCode: 'US',
           testEnvironment: true,
         );
         
