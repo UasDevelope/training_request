@@ -61,3 +61,12 @@ class CompleteBooking extends BookingEvent {
   @override
   List<Object> get props => [bookingId];
 }
+
+class UpdatePrice extends BookingEvent {
+  final double price;
+
+  const UpdatePrice({required this.price});
+
+  @override
+  List<Object> get props => [price];
+}

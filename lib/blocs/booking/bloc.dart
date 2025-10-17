@@ -16,6 +16,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingStat> {
   final TextEditingController writeSomething = TextEditingController();
   final TextEditingController date = TextEditingController();
   DateTime? selectedDate;
+  double selectedPrice = 5.0; // Default price
 
   BookingRepository bookingRepository;
   BookingBloc(this.bookingRepository, this.currentLocationRepository)
@@ -89,6 +90,12 @@ class BookingBloc extends Bloc<BookingEvent, BookingStat> {
         emit(CompleteBookingError(message: e.toString()));
       }
     });
+    
+    on<UpdatePrice>((event, emit) {
+      selectedPrice = event.price;
+      price.text = event.price.toString();
+      emit(PriceUpdatedState(price: event.price));
+    });
   }
 
   void clearController(ClearController event, Emitter<BookingStat> emit) {
@@ -96,5 +103,6 @@ class BookingBloc extends Bloc<BookingEvent, BookingStat> {
     price.clear();
     writeSomething.clear();
     date.clear();
+    selectedPrice = 5.0; // Reset to default price
   }
 }

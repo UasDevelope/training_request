@@ -69,3 +69,10 @@ class CompleteBookingError extends BookingStat {
   @override
   List<Object> get props => [message];
 }
+
+class PriceUpdatedState extends BookingStat {
+  final double price;
+  const PriceUpdatedState({required this.price});
+  @override
+  List<Object> get props => [price];
+}

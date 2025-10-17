@@ -14,11 +14,26 @@ import 'package:training_request/utils/validator.dart';
 import 'package:training_request/widgets/app_text.dart';
 import 'package:training_request/widgets/custom_button.dart';
 import 'package:training_request/widgets/form_field.dart';
+import 'package:training_request/widgets/app_dropdown.dart';
 
 import '../../services/dateTime.dart';
 
 class BookingScreen extends StatelessWidget {
   const BookingScreen({super.key});
+
+  // Generate price options from $5 to $100 in multiples of $5
+  List<DropdownMenuItem<double>> _getPriceOptions() {
+    List<DropdownMenuItem<double>> options = [];
+    for (int i = 5; i <= 100; i += 5) {
+      options.add(
+        DropdownMenuItem<double>(
+          value: i.toDouble(),
+          child: Text('\$${i.toString()}'),
+        ),
+      );
+    }
+    return options;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,12 +95,6 @@ class BookingScreen extends StatelessWidget {
               ),
               SizedBox(height: 12),
               AppTextFormField(
-                onTap: () {},
-                onChanged: (newValue) {
-                  final hours = int.tryParse(newValue) ?? 0;
-                  final totalPrice = hours * 36;
-                  bookingBloc.price.text = totalPrice.toString();
-                },
                 controller: bookingBloc.Nohrs,
                 hintText: AppStrings.enterNoOfHours,
                 validator: AppValidators.validateRequired,
@@ -110,11 +119,21 @@ class BookingScreen extends StatelessWidget {
                 prefixIcon: AppImages.calendar,
               ),
               const SizedBox(height: 12),
-              AppTextFormField(
-                controller: bookingBloc.price,
+              AppDropdown<double>(
+                value: bookingBloc.selectedPrice,
+                items: _getPriceOptions(),
                 hintText: AppStrings.enterPrice,
-                readOnly: true,
-                validator: AppValidators.validateRequired,
+                onChanged: (double? newPrice) {
+                  if (newPrice != null) {
+                    bookingBloc.add(UpdatePrice(price: newPrice));
+                  }
+                },
+                validator: (double? value) {
+                  if (value == null) {
+                    return "Price is required";
+                  }
+                  return null;
+                },
                 prefixIcon: AppImages.coin,
               ),
               const SizedBox(height: 12),
@@ -130,7 +149,7 @@ class BookingScreen extends StatelessWidget {
                     CreateBooking(
                       NoHrs: int.parse(bookingBloc.Nohrs.text),
                       date: bookingBloc.selectedDate!,
-                      price: double.parse(bookingBloc.price.text),
+                      price: bookingBloc.selectedPrice,
                       specialRequirements: bookingBloc.writeSomething.text,
                     ),
                   );
